@@ -1,0 +1,54 @@
+name: deploy
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  lint_fmt:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - run: npm install -g yarn
+      - run: yarn install --frozen-lockfile
+      - name: build
+        run: yarn build
+
+      - name: lint
+        run: yarn lint:ci
+
+      - name: fmt
+        run: yarn fmt:ci
+
+  deploy:
+    runs-on: ubuntu-22.04
+    if:  github.event_name == 'push' || github.event.pull_request.merged == true
+    needs: lint_fmt
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - run: npm install -g yarn
+      - run: yarn install --frozen-lockfile
+      - run: yarn build
+
+      - name: export
+        run: yarn export
+
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./out
