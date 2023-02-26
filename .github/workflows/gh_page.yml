@@ -6,7 +6,7 @@ on:
       - master
 
 jobs:
-  lint-fmt:
+  lint_fmt:
     runs-on: ubuntu-22.04
     - uses: actions/checkout@v3
 
