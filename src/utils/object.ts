@@ -1,9 +1,15 @@
-import { GetPriorityFunc, LayerParams, Value } from "@/type/layer";
+import {
+  GetPriorityFunc,
+  LayerParams,
+  NormalizedPrimitiveLayerParams,
+  PrimitiveLayerParams,
+  Value,
+} from "@/type/layer";
 
-export function addPriority<T extends Record<string, string | number>>(
+export function addPriority<T extends PrimitiveLayerParams>(
   params: T,
   getPriority: GetPriorityFunc<T>
-): LayerParams {
+): LayerParams<PrimitiveLayerParams> {
   return Object.entries(params)
     .map(
       ([key, value]) =>
@@ -15,5 +21,5 @@ export function addPriority<T extends Record<string, string | number>>(
     .reduce((prev, [key, value]) => {
       prev[key] = value;
       return prev;
-    }, {} as LayerParams);
+    }, {} as LayerParams<PrimitiveLayerParams>);
 }

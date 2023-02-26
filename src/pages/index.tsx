@@ -3,6 +3,7 @@ import { Input, Output } from "@/components/layers/JustTensor";
 import { Sequential } from "@/components/Sequential";
 import { Conv2dSize, Tensor } from "@/type/size";
 import Head from "next/head";
+import { useMemo } from "react";
 
 export default function Home() {
   const input = {
@@ -10,8 +11,8 @@ export default function Home() {
   } satisfies Tensor<Conv2dSize>;
   const { layer, tensor } = Sequential([
     Input<Conv2dSize>,
-    Conv2d({ in_channels: 1, out_channels: 3, kernel_size: 5 }),
-    Conv2d({ in_channels: 3, out_channels: 3, kernel_size: 3 }),
+    Conv2d(useMemo(() => ({ in_channels: 1, out_channels: 3, kernel_size: 5 }), [])),
+    Conv2d(useMemo(() => ({ in_channels: 3, out_channels: 3, kernel_size: 3 }), [])),
     Output<Conv2dSize>,
   ])(input);
   return (

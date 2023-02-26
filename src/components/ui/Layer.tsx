@@ -1,13 +1,15 @@
-import { LayerParams } from "@/type/layer";
+import { LayerParams, OnClickTypes, PrimitiveLayerParams } from "@/type/layer";
 import { displaySize, Size } from "@/type/size";
-import { FC } from "react";
+import { ChangeEvent } from "react";
 import styled from "styled-components";
+import { isNumberObject } from "util/types";
 
-export type LayerProps = {
+export type LayerProps<T extends LayerParams<PrimitiveLayerParams>> = {
   name: string;
-  params: LayerParams;
+  params: T;
   sizeBeforeApply?: Size;
   sizeAfterApply: Size;
+  onClicks: OnClickTypes<T>;
 };
 const LayerParamBox = styled.div`
   display: grid;
@@ -42,12 +44,23 @@ const SizeExpr = styled.div`
   justify-content: right;
 `;
 
-export const Layer: FC<LayerProps> = ({
+type TransparentInputProps = {
+  isReadonly: boolean;
+};
+const TransparentInput = styled.input<TransparentInputProps>`
+  cursor: ${({ isReadonly }) => (isReadonly ? "pointer" : "auto")};
+  border: none;
+  background-color: inherit;
+  font-size: inherit;
+`;
+
+export const Layer = <T extends LayerParams<PrimitiveLayerParams>>({
   name,
   params,
   sizeBeforeApply,
   sizeAfterApply,
-}) => {
+  onClicks,
+}: LayerProps<T>) => {
   const sizeExpression = sizeBeforeApply
     ? `${displaySize(sizeBeforeApply)} → ${displaySize(sizeAfterApply)}`
     : displaySize(sizeAfterApply);
@@ -61,11 +74,20 @@ export const Layer: FC<LayerProps> = ({
             ([, { priority: priorityA }], [, { priority: priorityB }]) =>
               priorityA - priorityB
           )
-          .map(([key, val]) => (
-            <div key={key}>
-              {key}: {val.value}
-            </div>
-          ))}
+          .map(([key, val]) => {
+            const onClick = onClicks[key];
+            const isReadonly = onClick === undefined;
+            console.log({key, isReadonly});
+            const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+              onClick ? onClick(Number(e.target.value)) : undefined
+            };
+            return (
+              <div key={key}>
+                {key}:
+                <TransparentInput onChange={handleChange} isReadonly={isReadonly} readOnly={isReadonly} value={val.value} type="number" />
+              </div>
+            );
+          })}
       </LayerParamBox>
     </Grid>
   );

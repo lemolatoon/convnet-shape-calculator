@@ -8,7 +8,14 @@ const JustTensor =
     tensor: Parameters<LayerComponent<T>>[0]
   ): ReturnType<LayerComponent<T>> => {
     return {
-      layer: <Layer name={name} params={{}} sizeAfterApply={tensor.shape} />,
+      layer: (
+        <Layer
+          name={name}
+          params={{}}
+          onClicks={{}}
+          sizeAfterApply={tensor.shape}
+        />
+      ),
       tensor: tensor,
     };
   };
