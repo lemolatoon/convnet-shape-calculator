@@ -8,27 +8,28 @@ on:
 jobs:
   lint_fmt:
     runs-on: ubuntu-22.04
-    - uses: actions/checkout@v3
+    steps:
+      - uses: actions/checkout@v3
 
-    - name: Setup Node
-      uses: actions/setup-node@v3
-      with:
-        node-version: 18
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
 
-    - run: npm install -g yarn
-    - run: yarn install --frozen-lockfile
-    - name: build
-      run: yarn build
+      - run: npm install -g yarn
+      - run: yarn install --frozen-lockfile
+      - name: build
+        run: yarn build
 
-    - name: lint
-      run: yarn lint:ci
+      - name: lint
+        run: yarn lint:ci
 
-    - name: fmt
-      run: yarn fmt:ci
+      - name: fmt
+        run: yarn fmt:ci
 
   deploy:
     runs-on: ubuntu-22.04
-    needs: lint-fmt
+    needs: lint_fmt
 
     steps:
       - uses: actions/checkout@v3
