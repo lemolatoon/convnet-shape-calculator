@@ -6,6 +6,14 @@ on:
   pull_request:
     branches: [ "master" ]
 
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
 jobs:
   lint_fmt:
     runs-on: ubuntu-22.04
@@ -28,7 +36,7 @@ jobs:
       - name: fmt
         run: yarn fmt:ci
 
-  deploy:
+  build:
     runs-on: ubuntu-22.04
     if:  github.event_name == 'push' || github.event.pull_request.merged == true
     needs: lint_fmt
@@ -48,8 +56,23 @@ jobs:
       - name: export
         run: yarn export
 
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v1
+        with:
+          path: ./out
+
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./out
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v1
