@@ -10,7 +10,7 @@
     "lint:nofix": "next lint --strict --dir 'src/'",
     "lint": "yarn lint:nofix --fix",
     "lint:ci": "yarn lint:nofix",
-    "fmt:nofix": "yarn prettier 'src/pages/'",
+    "fmt:nofix": "yarn prettier 'src/'",
     "fmt": "yarn fmt:nofix --write",
     "fmt:ci": "yarn fmt:nofix --check"
   },
