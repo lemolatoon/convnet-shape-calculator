@@ -6,7 +6,7 @@ import styled from "styled-components";
 export type LayerProps = {
   name: string;
   params: LayerParams;
-  sizeBeforeApply: Size;
+  sizeBeforeApply?: Size;
   sizeAfterApply: Size;
 };
 const LayerParamBox = styled.div`
@@ -48,12 +48,13 @@ export const Layer: FC<LayerProps> = ({
   sizeBeforeApply,
   sizeAfterApply,
 }) => {
+  const sizeExpression = sizeBeforeApply
+    ? `${displaySize(sizeBeforeApply)} → ${displaySize(sizeAfterApply)}`
+    : displaySize(sizeAfterApply);
   return (
     <Grid>
       <Name>{name}</Name>
-      <SizeExpr>
-        {displaySize(sizeBeforeApply)} → {displaySize(sizeAfterApply)}
-      </SizeExpr>
+      <SizeExpr>{sizeExpression}</SizeExpr>
       <LayerParamBox>
         {Object.entries(params)
           .sort(
