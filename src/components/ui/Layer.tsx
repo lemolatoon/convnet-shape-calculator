@@ -1,11 +1,15 @@
-import { LayerParams, OnClickTypes, PrimitiveLayerParams } from "@/type/layer";
+import {
+  LayerParamsWithEmptyString,
+  OnClickTypes,
+  PrimitiveLayerParams,
+} from "@/type/layer";
 import { displaySize, Size } from "@/type/size";
 import { ChangeEvent } from "react";
 import styled from "styled-components";
 
 export type LayerProps<T extends PrimitiveLayerParams> = {
   name: string;
-  params: LayerParams<T>;
+  params: LayerParamsWithEmptyString<T>;
   sizeBeforeApply?: Size;
   sizeAfterApply?: Size;
   errorMsg?: string;
@@ -52,9 +56,6 @@ const Grid = styled.div`
   }
 `;
 
-type IsSpProps = {
-  isSp?: boolean;
-};
 const Name = styled.div`
   @media (max-width: 767px) {
     font-size: 2em;

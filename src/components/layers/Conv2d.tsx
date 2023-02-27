@@ -8,6 +8,7 @@ import { Layer } from "@/components/ui/Layer";
 import { useObjectState } from "@/hooks/useObjectState";
 import { LayerComponent, OnClickTypes } from "@/type/layer";
 import { Conv2dSize, Tensor } from "@/type/size";
+import { paramsHasNoNull } from "@/utils/layer";
 import { addPriority } from "@/utils/object";
 
 export const Conv2d = (__params: Conv2dParams): LayerComponent<Conv2dSize> => {
@@ -17,12 +18,17 @@ export const Conv2d = (__params: Conv2dParams): LayerComponent<Conv2dSize> => {
     );
     const onClicks: OnClickTypes<Conv2dParams> = (key) => (val) =>
       dispatch(key, val);
-    const { layer: conv2dF } = conv2d(params);
     const { sizeAfterApply, errorMsg } = (() => {
       if (!tensor) {
         return { sizeAfterApply: undefined, errorMsg: undefined };
       }
       try {
+        const validate = (key: string, val: number) => {
+          if (val < 0) throw new Error(`param (${key}) is negative: ${val}`);
+        };
+        if (!paramsHasNoNull<Conv2dParams>(params, validate))
+          throw new Error("unreachable");
+        const { layer: conv2dF } = conv2d(params);
         return { sizeAfterApply: conv2dF(tensor.shape), errorMsg: undefined };
       } catch (e: unknown) {
         let msg = "Unknown Error Occured";
