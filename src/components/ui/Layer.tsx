@@ -92,12 +92,13 @@ export const Layer = <T extends PrimitiveLayerParams>({
     }
   })();
   const isSp = useIsSp();
+  const isWide = !useIsSp(1200);
   return (
     <GridWrapper>
       <Grid>
         <Name isSp={isSp}>{name}</Name>
         <SizeExpr isSp={isSp}>{sizeExpression}</SizeExpr>
-        <LayerParamBox n_columns={useIsSp(1200) ? 2 : 4} isSp={isSp}>
+        <LayerParamBox n_columns={isWide ? 4 : 2} isSp={isSp}>
           {Object.entries(params)
             .sort(
               ([, { priority: priorityA }], [, { priority: priorityB }]) =>
