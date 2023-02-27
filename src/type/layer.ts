@@ -22,7 +22,7 @@ export type GetPriorityFunc<T extends PrimitiveLayerParams> = (
   val: keyof T
 ) => number;
 
-export type LayerComponent<T extends Size> = (tensor: Tensor<T>) => {
+export type LayerComponent<T extends Size> = (tensor?: Tensor<T>) => {
   layer: React.ReactElement;
-  tensor: Tensor<T>;
+  tensor?: Tensor<T>;
 };

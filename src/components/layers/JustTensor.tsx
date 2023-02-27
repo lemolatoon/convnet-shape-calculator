@@ -13,14 +13,14 @@ const JustTensor =
           name={name}
           params={{}}
           onClicks={() => undefined}
-          sizeAfterApply={tensor.shape}
+          sizeAfterApply={tensor?.shape}
         />
       ),
       tensor: tensor,
     };
   };
 
-export const Input = <T extends Size>(tensor: Tensor<T>) =>
+export const Input = <T extends Size>(tensor?: Tensor<T>) =>
   JustTensor("Input")(tensor);
-export const Output = <T extends Size>(tensor: Tensor<T>) =>
+export const Output = <T extends Size>(tensor?: Tensor<T>) =>
   JustTensor("Output")(tensor);
