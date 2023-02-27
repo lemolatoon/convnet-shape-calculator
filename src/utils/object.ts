@@ -2,7 +2,6 @@ import {
   GetPriorityFunc,
   LayerParams,
   PrimitiveLayerParams,
-  Value,
 } from "@/type/layer";
 
 export function addPriority<T extends PrimitiveLayerParams>(
@@ -12,10 +11,7 @@ export function addPriority<T extends PrimitiveLayerParams>(
   return Object.entries(params)
     .map(
       ([key, value]) =>
-        [key, { priority: getPriority(key), value: value }] satisfies [
-          string,
-          Value
-        ]
+        [key, { priority: getPriority(key), value: value }] as const
     )
     .reduce((prev, [key, value]) => {
       prev[key] = value;
