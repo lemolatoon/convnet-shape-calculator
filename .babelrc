@@ -1,5 +1,0 @@
-// https://zenn.dev/nbr41to/articles/c0c691653e3d55
-{
-  "presets": ["next/babel"],
-  "plugins": [["styled-components", { "ssr": true }]]
-}
