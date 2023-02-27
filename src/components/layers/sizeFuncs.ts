@@ -28,23 +28,20 @@ export function Conv2dParamProprity(key: keyof Required<Conv2dParams>) {
       throw new Error("unreacheable");
   }
 }
-export const conv2d: (params: Conv2dParams) => {
-  layer: LayerFunction<Conv2dSize>;
-  params: Required<Conv2dParams>;
-} = ({
-  stride: _stride,
-  padding: _padding,
-  dilation: _dilation,
-  ...params
-}) => {
+export const normalizeConv2dParams = (
+  params: Conv2dParams
+): Required<Conv2dParams> => {
   const passingParams: Required<Conv2dParams> = {
-    stride: _stride ?? 1,
-    padding: _padding ?? 0,
-    dilation: _dilation ?? 1,
+    stride: params.stride ?? 1,
+    padding: params.padding ?? 0,
+    dilation: params.dilation ?? 1,
     ...params,
   };
-  const { in_channels, out_channels, kernel_size, stride, padding, dilation } =
-    passingParams;
+  return passingParams;
+};
+export const conv2d: (params: Required<Conv2dParams>) => {
+  layer: LayerFunction<Conv2dSize>;
+} = ({ in_channels, out_channels, kernel_size, stride, padding, dilation }) => {
   const layer: LayerFunction<Conv2dSize> = (size) => {
     const { c_in, h_in, w_in } =
       size[3] !== undefined
@@ -69,5 +66,5 @@ export const conv2d: (params: Conv2dParams) => {
       return [...features];
     }
   };
-  return { layer, params: passingParams };
+  return { layer };
 };

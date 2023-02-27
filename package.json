@@ -12,7 +12,11 @@
     "lint:ci": "yarn lint:nofix",
     "fmt:nofix": "yarn prettier 'src/'",
     "fmt": "yarn fmt:nofix --write",
-    "fmt:ci": "yarn fmt:nofix --check"
+    "fmt:ci": "yarn fmt:nofix --check",
+    "test": "vitest",
+    "test:ci": "yarn vitest run",
+    "coverage": "vitest run --coverage",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@types/node": "18.14.1",
@@ -23,15 +27,20 @@
     "next": "13.2.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+    "react-responsive": "^9.0.2",
     "styled-components": "^5.3.6",
     "typescript": "4.9.5"
   },
   "devDependencies": {
+    "@testing-library/react": "^14.0.0",
     "@types/styled-components": "^5.1.26",
     "@typescript-eslint/eslint-plugin": "^5.53.0",
     "@typescript-eslint/parser": "^5.53.0",
+    "@vitest/coverage-c8": "^0.29.1",
     "eslint-plugin-react": "^7.32.2",
-    "prettier": "^2.8.4"
+    "happy-dom": "^8.9.0",
+    "prettier": "^2.8.4",
+    "vitest": "^0.29.1"
   },
   "engines": {
     "node": "18"

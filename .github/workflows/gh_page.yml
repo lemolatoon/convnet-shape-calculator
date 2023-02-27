@@ -2,9 +2,9 @@ name: deploy
 
 on:
   push:
-    branches: [ "master" ]
+    branches: ["master"]
   pull_request:
-    branches: [ "master" ]
+    branches: ["master"]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -35,10 +35,13 @@ jobs:
 
       - name: fmt
         run: yarn fmt:ci
+      
+      - name: test
+        run: yarn test:ci
 
   build:
     runs-on: ubuntu-22.04
-    if:  github.event_name == 'push' || github.event.pull_request.merged == true
+    if: github.event_name == 'push' || github.event.pull_request.merged == true
     needs: lint_fmt
 
     steps:
