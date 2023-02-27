@@ -1,13 +1,17 @@
 import {
   GetPriorityFunc,
-  LayerParams,
+  LayerParamsWithEmptyString,
   PrimitiveLayerParams,
 } from "@/type/layer";
 
-export function addPriority<T extends PrimitiveLayerParams>(
+export type AddEmptyString<T extends Record<string, number>> = {
+  [K in keyof T]: number | "";
+};
+
+export function addPriority<T extends AddEmptyString<PrimitiveLayerParams>>(
   params: T,
   getPriority: GetPriorityFunc<T>
-): LayerParams<PrimitiveLayerParams> {
+): LayerParamsWithEmptyString<PrimitiveLayerParams> {
   return Object.entries(params)
     .map(
       ([key, value]) =>
@@ -16,5 +20,5 @@ export function addPriority<T extends PrimitiveLayerParams>(
     .reduce((prev, [key, value]) => {
       prev[key] = value;
       return prev;
-    }, {} as LayerParams<PrimitiveLayerParams>);
+    }, {} as LayerParamsWithEmptyString<PrimitiveLayerParams>);
 }

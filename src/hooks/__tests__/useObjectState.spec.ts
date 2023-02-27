@@ -23,5 +23,7 @@ describe("useObjectState", () => {
     expect(result.current.obj.a).toEqual(25);
     act(() => result.current.dispatch("c", "10"));
     expect(result.current.obj.c).toEqual(10);
+    act(() => result.current.dispatch("b", ""));
+    expect(result.current.obj.b).toEqual("");
   });
 });
