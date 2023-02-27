@@ -7,9 +7,9 @@ import Head from "next/head";
 import { useMemo } from "react";
 
 export default function Home() {
-  const input = {
+  const input: Tensor<Conv2dSize> = {
     shape: [32, 1, 28, 28],
-  } satisfies Tensor<Conv2dSize>;
+  };
   const { layer } = Sequential([
     Input<Conv2dSize>,
     Conv2d(
