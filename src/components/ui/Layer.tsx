@@ -1,4 +1,3 @@
-import { useIsSp } from "@/hooks/useIsSp";
 import { LayerParams, OnClickTypes, PrimitiveLayerParams } from "@/type/layer";
 import { displaySize, Size } from "@/type/size";
 import { ChangeEvent } from "react";
@@ -12,13 +11,20 @@ export type LayerProps<T extends PrimitiveLayerParams> = {
   errorMsg?: string;
   onClicks: OnClickTypes<T>;
 };
-type LayerParamBoxProps = {
-  n_columns?: number;
-} & IsSpProps;
-const LayerParamBox = styled.div<LayerParamBoxProps>`
+const LayerParamBox = styled.div`
   display: grid;
-  grid-template-columns: repeat(${({ n_columns }) => `${n_columns ?? 4}`}, 1fr);
-  font-size: ${({ isSp }) => (isSp ? `0.75em` : `32px`)};
+  @media (max-width: 767px) {
+    font-size: 0.75em;
+    grid-template-columns: repeat(2, 1fr);
+  }
+  @media (min-width: 767px) and (max-width: 1200px) {
+    font-size: 32px;
+    grid-template-columns: repeat(2, 1fr);
+  }
+  @media (min-width: 1200px) {
+    font-size: 32px;
+    grid-template-columns: repeat(4, 1fr);
+  }
 `;
 
 const LayerParam = styled.div`
@@ -49,13 +55,23 @@ const Grid = styled.div`
 type IsSpProps = {
   isSp?: boolean;
 };
-const Name = styled.div<IsSpProps>`
-  font-size: ${({ isSp }) => (isSp ? `2em` : `50px`)};
+const Name = styled.div`
+  @media (max-width: 767px) {
+    font-size: 2em;
+  }
+  @media (min-width: 767px) {
+    font-size: 50px;
+  }
   font-weight: bold;
 `;
 
-const SizeExpr = styled.div<IsSpProps>`
-  font-size: ${({ isSp }) => (isSp ? `0.8em` : `32px`)};
+const SizeExpr = styled.div`
+  @media (max-width: 767px) {
+    font-size: 0.8em;
+  }
+  @media (min-width: 767px) {
+    font-size: 32px;
+  }
   font-weight: bold;
   display: flex;
   align-items: center;
@@ -91,14 +107,12 @@ export const Layer = <T extends PrimitiveLayerParams>({
       return `${displaySize(sizeBeforeApply)} →`;
     }
   })();
-  const isSp = useIsSp();
-  const isWide = !useIsSp(1200);
   return (
     <GridWrapper>
       <Grid>
-        <Name isSp={isSp}>{name}</Name>
-        <SizeExpr isSp={isSp}>{sizeExpression}</SizeExpr>
-        <LayerParamBox n_columns={isWide ? 4 : 2} isSp={isSp}>
+        <Name>{name}</Name>
+        <SizeExpr>{sizeExpression}</SizeExpr>
+        <LayerParamBox>
           {Object.entries(params)
             .sort(
               ([, { priority: priorityA }], [, { priority: priorityB }]) =>
