@@ -30,6 +30,11 @@ export default function Home() {
         <meta property="og:image" content={assetFullUrl("/conv.png")} />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:site" content="@lemolatoon1" />
+        <meta
+          name="twitter:description"
+          content="Interactively calculate Convolution Network shapes"
+        />
+        <meta property="twitter:image" content={assetFullUrl("/conv.png")} />
       </Head>
       <main>
         <h1>ConvNet Shape Calculator</h1>
