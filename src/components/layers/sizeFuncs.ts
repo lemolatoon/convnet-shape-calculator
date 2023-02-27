@@ -1,4 +1,3 @@
-import { NormalizedPrimitiveLayerParams } from "@/type/layer";
 import { Conv2dSize, LayerFunction, SizeError } from "@/type/size";
 import { exhaustiveChack } from "@/type/util";
 

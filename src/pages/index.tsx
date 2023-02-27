@@ -9,10 +9,14 @@ export default function Home() {
   const input = {
     shape: [32, 1, 28, 28],
   } satisfies Tensor<Conv2dSize>;
-  const { layer, tensor } = Sequential([
+  const { layer } = Sequential([
     Input<Conv2dSize>,
-    Conv2d(useMemo(() => ({ in_channels: 1, out_channels: 3, kernel_size: 5 }), [])),
-    Conv2d(useMemo(() => ({ in_channels: 3, out_channels: 3, kernel_size: 3 }), [])),
+    Conv2d(
+      useMemo(() => ({ in_channels: 1, out_channels: 3, kernel_size: 5 }), [])
+    ),
+    Conv2d(
+      useMemo(() => ({ in_channels: 3, out_channels: 3, kernel_size: 3 }), [])
+    ),
     Output<Conv2dSize>,
   ])(input);
   return (

@@ -15,7 +15,8 @@
     "fmt:ci": "yarn fmt:nofix --check",
     "test": "vitest",
     "test:ci": "yarn vitest run",
-    "coverage": "vitest run --coverage"
+    "coverage": "vitest run --coverage",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@types/node": "18.14.1",
@@ -26,6 +27,7 @@
     "next": "13.2.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+    "react-responsive": "^9.0.2",
     "styled-components": "^5.3.6",
     "typescript": "4.9.5"
   },

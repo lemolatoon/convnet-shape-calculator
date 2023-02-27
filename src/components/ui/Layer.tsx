@@ -1,21 +1,29 @@
+import { useIsSp } from "@/hooks/useIsSp";
 import { LayerParams, OnClickTypes, PrimitiveLayerParams } from "@/type/layer";
 import { displaySize, Size } from "@/type/size";
 import { ChangeEvent } from "react";
 import styled from "styled-components";
-import { isNumberObject } from "util/types";
 
-export type LayerProps<T extends LayerParams<PrimitiveLayerParams>> = {
+export type LayerProps<T extends PrimitiveLayerParams> = {
   name: string;
-  params: T;
+  params: LayerParams<T>;
   sizeBeforeApply?: Size;
   sizeAfterApply: Size;
   onClicks: OnClickTypes<T>;
 };
-const LayerParamBox = styled.div`
+type LayerParamBoxProps = {
+  n_columns?: number;
+};
+const LayerParamBox = styled.div<LayerParamBoxProps>`
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(${({ n_columns }) => `${n_columns ?? 4}`}, 1fr);
   font-size: 32px;
 `;
+
+const LayerParam = styled.div`
+  display: flex;
+`;
+
 const Grid = styled.div`
   display: grid;
   grid-template-columns: 1fr 3fr;
@@ -49,12 +57,14 @@ type TransparentInputProps = {
 };
 const TransparentInput = styled.input<TransparentInputProps>`
   cursor: ${({ isReadonly }) => (isReadonly ? "pointer" : "auto")};
+  margin-right: auto;
+  width: 100px;
   border: none;
   background-color: inherit;
   font-size: inherit;
 `;
 
-export const Layer = <T extends LayerParams<PrimitiveLayerParams>>({
+export const Layer = <T extends PrimitiveLayerParams>({
   name,
   params,
   sizeBeforeApply,
@@ -68,24 +78,29 @@ export const Layer = <T extends LayerParams<PrimitiveLayerParams>>({
     <Grid>
       <Name>{name}</Name>
       <SizeExpr>{sizeExpression}</SizeExpr>
-      <LayerParamBox>
+      <LayerParamBox n_columns={useIsSp(1200) ? 2 : 4}>
         {Object.entries(params)
           .sort(
             ([, { priority: priorityA }], [, { priority: priorityB }]) =>
               priorityA - priorityB
           )
           .map(([key, val]) => {
-            const onClick = onClicks[key];
+            const onClick = onClicks(key);
             const isReadonly = onClick === undefined;
-            console.log({key, isReadonly});
             const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-              onClick ? onClick(Number(e.target.value)) : undefined
+              onClick ? onClick(e.target.value) : undefined;
             };
             return (
-              <div key={key}>
+              <LayerParam key={key}>
                 {key}:
-                <TransparentInput onChange={handleChange} isReadonly={isReadonly} readOnly={isReadonly} value={val.value} type="number" />
-              </div>
+                <TransparentInput
+                  onChange={handleChange}
+                  isReadonly={isReadonly}
+                  readOnly={isReadonly}
+                  value={val.value}
+                  type="number"
+                />
+              </LayerParam>
             );
           })}
       </LayerParamBox>

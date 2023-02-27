@@ -13,9 +13,9 @@ export type LayerParams<T extends PrimitiveLayerParams> = {
   [K in keyof Required<T>]: { priority: number; value: number };
 };
 
-export type OnClickTypes<T extends Record<string, unknown>> = {
-  [K in keyof T]: ((val: number) => void) | undefined;
-};
+export type OnClickTypes<T extends Record<string, unknown>> = (
+  key: keyof T
+) => ((val: string) => void) | undefined;
 
 export type GetPriorityFunc<T extends PrimitiveLayerParams> = (
   // eslint-next-lint-disable no-unused-vars

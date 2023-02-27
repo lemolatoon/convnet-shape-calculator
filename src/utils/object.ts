@@ -1,7 +1,6 @@
 import {
   GetPriorityFunc,
   LayerParams,
-  NormalizedPrimitiveLayerParams,
   PrimitiveLayerParams,
   Value,
 } from "@/type/layer";

@@ -12,7 +12,7 @@ const JustTensor =
         <Layer
           name={name}
           params={{}}
-          onClicks={{}}
+          onClicks={() => undefined}
           sizeAfterApply={tensor.shape}
         />
       ),

@@ -1,8 +1,8 @@
 import { useState } from "react";
 
-type Object = Record<string, number>;
+type ParamObject = Record<string, number>;
 
-export const useObjectState = <Keys extends keyof Object>(
+export const useObjectState = <Keys extends keyof ParamObject>(
   init: Record<Keys, number>
 ) => {
   const [obj, setObj] = useState(init);
