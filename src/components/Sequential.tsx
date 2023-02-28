@@ -3,6 +3,11 @@ import { Size, Tensor } from "@/type/size";
 import { useState } from "react";
 import { MdDragIndicator } from "react-icons/md";
 import styled from "styled-components";
+import {
+  DragDropContext,
+  Draggable,
+  Droppable,
+} from "@hello-pangea/dnd";
 
 const SequentialGrid = styled.div`
   display: grid;
@@ -40,19 +45,44 @@ export const Sequential =
       },
       { layerUIs: [], tensors: [tensor] }
     );
+    const handleOnDragEnd = (result: any) => {
+      const items = Array.from(layers);
+      const [reorderedItem] = items.splice(result.source.index, 1);
+      items.splice(result.destination.index, 0, reorderedItem);
+
+      setLayers(items);
+    };
     const layer = (
-      <div>
-        {layerUIs.map(({ layerUI, id }) => {
-          return (
-            <SequentialGrid key={id}>
-              <IconWrappingBox>
-                <StyledDragIndicator />
-              </IconWrappingBox>
-              <div>{layerUI}</div>
-            </SequentialGrid>
-          );
-        })}
-      </div>
+      <DragDropContext onDragEnd={handleOnDragEnd}>
+        <Droppable droppableId="tempDrappableId">
+          {(provided) => (
+            <div
+              className="tempDrappableId"
+              {...provided.droppableProps}
+              ref={provided.innerRef}
+            >
+              {layerUIs.map(({ layerUI, id }, index) => {
+                return (
+                  <Draggable key={id} draggableId={`${id}`} index={index}>
+                    {(provided) => (
+                      <SequentialGrid
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        {...provided.dragHandleProps}
+                      >
+                        <IconWrappingBox>
+                          <StyledDragIndicator />
+                        </IconWrappingBox>
+                        <div>{layerUI}</div>
+                      </SequentialGrid>
+                    )}
+                  </Draggable>
+                );
+              })}
+            </div>
+          )}
+        </Droppable>
+      </DragDropContext>
     );
     return { layer, tensor: tensors.slice(-1)[0] };
   };
