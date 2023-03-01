@@ -11,21 +11,22 @@ import { Conv2dSize, Tensor } from "@/type/size";
 import { paramsHasNoNull } from "@/utils/layer";
 import { addPriority } from "@/utils/object";
 
+const validate = (key: string, val: number) => {
+  if (val < 0) throw new Error(`param (${key}) is negative: ${val}`);
+};
+
 export const useConv2d = (__params: Conv2dParams): applyLayer<Conv2dSize> => {
   const { obj: params, dispatch } = useObjectState(
     normalizeConv2dParams(__params)
   );
+  const onClicks: OnClickTypes<Conv2dParams> = (key) => (val) =>
+    dispatch(key, val);
   const applyLayer = (tensor: Tensor<Conv2dSize> | undefined) => {
-    const onClicks: OnClickTypes<Conv2dParams> = (key) => (val) =>
-      dispatch(key, val);
     const { sizeAfterApply, errorMsg } = (() => {
       if (!tensor) {
         return { sizeAfterApply: undefined, errorMsg: undefined };
       }
       try {
-        const validate = (key: string, val: number) => {
-          if (val < 0) throw new Error(`param (${key}) is negative: ${val}`);
-        };
         if (!paramsHasNoNull<Conv2dParams>(params, validate))
           throw new Error("unreachable");
         const { layer: conv2dF } = conv2d(params);
@@ -38,7 +39,7 @@ export const useConv2d = (__params: Conv2dParams): applyLayer<Conv2dSize> => {
         return { errorMsg: msg, sizeAfterApply: undefined };
       }
     })();
-    const layer = (
+    const renderLayer = () => (
       <Layer
         name={"Conv2d"}
         params={addPriority(params, Conv2dParamProprity)}
@@ -46,11 +47,11 @@ export const useConv2d = (__params: Conv2dParams): applyLayer<Conv2dSize> => {
         sizeAfterApply={sizeAfterApply}
         onClicks={onClicks}
         errorMsg={errorMsg}
-      ></Layer>
+      />
     );
 
     return {
-      layer,
+      renderLayer,
       tensor: sizeAfterApply ? { shape: sizeAfterApply } : undefined,
     };
   };

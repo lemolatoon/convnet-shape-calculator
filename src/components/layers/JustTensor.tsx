@@ -8,7 +8,7 @@ const makeJustTensorApplyLayer =
     tensor: Parameters<applyLayer<T>>[0]
   ): ReturnType<applyLayer<T>> => {
     return {
-      layer: (
+      renderLayer: () => (
         <Layer
           name={name}
           params={{}}

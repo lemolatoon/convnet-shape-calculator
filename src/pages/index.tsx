@@ -4,20 +4,17 @@ import { useSequential } from "@/components/Sequential";
 import { Conv2dSize, Tensor } from "@/type/size";
 import { assetFullUrl, assetUrl } from "@/utils/config";
 import Head from "next/head";
-import { useMemo } from "react";
 
 export default function Home() {
   const input: Tensor<Conv2dSize> = {
     shape: [32, 1, 28, 28],
   };
-  const { layer: layer } = useSequential([
+  const conv1 = useConv2d({ in_channels: 1, out_channels: 3, kernel_size: 5 });
+  const conv2 = useConv2d({ in_channels: 3, out_channels: 3, kernel_size: 3 });
+  const { renderLayer } = useSequential([
     applyInput<Conv2dSize>,
-    useConv2d(
-      useMemo(() => ({ in_channels: 1, out_channels: 3, kernel_size: 5 }), [])
-    ),
-    useConv2d(
-      useMemo(() => ({ in_channels: 3, out_channels: 3, kernel_size: 3 }), [])
-    ),
+    conv1,
+    conv2,
     applyOutput<Conv2dSize>,
   ])(input);
   return (
@@ -40,7 +37,7 @@ export default function Home() {
       </Head>
       <main>
         <h1>ConvNet Shape Calculator</h1>
-        {layer}
+        {renderLayer()}
       </main>
     </>
   );

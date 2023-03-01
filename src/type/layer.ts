@@ -27,6 +27,6 @@ export type GetPriorityFunc<T extends AddEmptyString<PrimitiveLayerParams>> = (
 ) => number;
 
 export type applyLayer<T extends Size> = (tensor?: Tensor<T>) => {
-  layer: JSX.Element;
+  renderLayer: () => JSX.Element;
   tensor?: Tensor<T>;
 };
