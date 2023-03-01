@@ -27,11 +27,11 @@ const StyledDragIndicator = styled(MdDragIndicator)`
 
 type SequentialLayoutProps = {
   handleOnDragEnd: OnDragEndResponder;
-  layerUIs: { layerUI: JSX.Element; id: number }[];
+  renderLayers: { renderLayer: () => JSX.Element; id: number }[];
 };
 const SequentialLayout = ({
   handleOnDragEnd,
-  layerUIs,
+  renderLayers,
 }: SequentialLayoutProps) => {
   return (
     <DragDropContext onDragEnd={handleOnDragEnd}>
@@ -42,7 +42,7 @@ const SequentialLayout = ({
             {...provided.droppableProps}
             ref={provided.innerRef}
           >
-            {layerUIs.map(({ layerUI, id }, index) => {
+            {renderLayers.map(({ renderLayer, id }, index) => {
               return (
                 <Draggable key={id} draggableId={`${id}`} index={index}>
                   {(provided) => (
@@ -54,7 +54,7 @@ const SequentialLayout = ({
                       <IconWrappingBox>
                         <StyledDragIndicator />
                       </IconWrappingBox>
-                      <div>{layerUI}</div>
+                      <div>{renderLayer()}</div>
                     </SequentialGrid>
                   )}
                 </Draggable>
@@ -72,11 +72,12 @@ export const useSequential = <T extends Size>(
 ): applyLayer<T> => {
   const genSequentialProps = useSequentialLogic(applyLayers);
   const applyLayer = (tensor?: Tensor<T>) => {
-    const { layerUIs, tensors, handleOnDragEnd } = genSequentialProps(tensor);
+    const { renderLayers, tensors, handleOnDragEnd } =
+      genSequentialProps(tensor);
     return {
-      layer: (
+      renderLayer: () => (
         <SequentialLayout
-          layerUIs={layerUIs}
+          renderLayers={renderLayers}
           handleOnDragEnd={handleOnDragEnd}
         />
       ),

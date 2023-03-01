@@ -10,20 +10,18 @@ export const useSequentialLogic = <T extends Size>(
     initLayerFuncs.map((initLayer, idx) => ({ layer: initLayer, id: idx }))
   );
   const genSequentialProps = (tensor?: Tensor<T>) => {
-    const { layerUIs, tensors } = layers.reduce<{
-      layerUIs: { layerUI: React.ReactElement; id: number }[];
+    const { renderLayers, tensors } = layers.reduce<{
+      renderLayers: { renderLayer: () => JSX.Element; id: number }[];
       tensors: (Tensor<T> | undefined)[];
     }>(
-      ({ layerUIs, tensors }, { layer, id }) => {
-        const { layer: layerUI, tensor: nextTensor } = layer(
-          tensors.slice(-1)[0]
-        );
+      ({ renderLayers, tensors }, { layer, id }) => {
+        const { renderLayer, tensor: nextTensor } = layer(tensors.slice(-1)[0]);
         return {
-          layerUIs: [...layerUIs, { layerUI, id }],
+          renderLayers: [...renderLayers, { renderLayer, id }],
           tensors: [...tensors, nextTensor],
         };
       },
-      { layerUIs: [], tensors: [tensor] }
+      { renderLayers: [], tensors: [tensor] }
     );
     // `OnDragEndResponder` is not appropriately typed
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -34,7 +32,7 @@ export const useSequentialLogic = <T extends Size>(
 
       setLayers(items);
     };
-    return { layerUIs, tensors, handleOnDragEnd };
+    return { renderLayers, tensors, handleOnDragEnd };
   };
   return genSequentialProps;
 };
