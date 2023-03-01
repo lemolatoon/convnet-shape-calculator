@@ -1,6 +1,5 @@
 import { Size, Tensor } from "@/type/size";
 import { AddEmptyString } from "@/utils/object";
-import React from "react";
 
 export type Value = {
   priority: number;
@@ -27,7 +26,7 @@ export type GetPriorityFunc<T extends AddEmptyString<PrimitiveLayerParams>> = (
   val: keyof T
 ) => number;
 
-export type LayerComponent<T extends Size> = (tensor?: Tensor<T>) => {
-  layer: React.ReactElement;
+export type applyLayer<T extends Size> = (tensor?: Tensor<T>) => {
+  layer: JSX.Element;
   tensor?: Tensor<T>;
 };
