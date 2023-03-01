@@ -1,12 +1,12 @@
 import { Layer } from "@/components/ui/Layer";
-import { LayerComponent } from "@/type/layer";
+import { applyLayer } from "@/type/layer";
 import { Size, Tensor } from "@/type/size";
 
-const JustTensor =
+const makeJustTensorApplyLayer =
   (name: string) =>
   <T extends Size>(
-    tensor: Parameters<LayerComponent<T>>[0]
-  ): ReturnType<LayerComponent<T>> => {
+    tensor: Parameters<applyLayer<T>>[0]
+  ): ReturnType<applyLayer<T>> => {
     return {
       layer: (
         <Layer
@@ -16,11 +16,11 @@ const JustTensor =
           sizeAfterApply={tensor?.shape}
         />
       ),
-      tensor: tensor,
+      tensor,
     };
   };
 
-export const Input = <T extends Size>(tensor?: Tensor<T>) =>
-  JustTensor("Input")(tensor);
-export const Output = <T extends Size>(tensor?: Tensor<T>) =>
-  JustTensor("Output")(tensor);
+export const applyInput = <T extends Size>(tensor?: Tensor<T>) =>
+  makeJustTensorApplyLayer("Input")(tensor);
+export const applyOutput = <T extends Size>(tensor?: Tensor<T>) =>
+  makeJustTensorApplyLayer("Output")(tensor);

@@ -6,16 +6,16 @@ import {
 } from "@/components/layers/sizeFuncs";
 import { Layer } from "@/components/ui/Layer";
 import { useObjectState } from "@/hooks/useObjectState";
-import { LayerComponent, OnClickTypes } from "@/type/layer";
+import { applyLayer as applyLayer, OnClickTypes } from "@/type/layer";
 import { Conv2dSize, Tensor } from "@/type/size";
 import { paramsHasNoNull } from "@/utils/layer";
 import { addPriority } from "@/utils/object";
 
-export const Conv2d = (__params: Conv2dParams): LayerComponent<Conv2dSize> => {
-  const useLayerComponent = (tensor: Tensor<Conv2dSize> | undefined) => {
-    const { obj: params, dispatch } = useObjectState(
-      normalizeConv2dParams(__params)
-    );
+export const useConv2d = (__params: Conv2dParams): applyLayer<Conv2dSize> => {
+  const { obj: params, dispatch } = useObjectState(
+    normalizeConv2dParams(__params)
+  );
+  const applyLayer = (tensor: Tensor<Conv2dSize> | undefined) => {
     const onClicks: OnClickTypes<Conv2dParams> = (key) => (val) =>
       dispatch(key, val);
     const { sizeAfterApply, errorMsg } = (() => {
@@ -46,12 +46,13 @@ export const Conv2d = (__params: Conv2dParams): LayerComponent<Conv2dSize> => {
         sizeAfterApply={sizeAfterApply}
         onClicks={onClicks}
         errorMsg={errorMsg}
-      />
+      ></Layer>
     );
+
     return {
       layer,
       tensor: sizeAfterApply ? { shape: sizeAfterApply } : undefined,
     };
   };
-  return useLayerComponent;
+  return applyLayer;
 };

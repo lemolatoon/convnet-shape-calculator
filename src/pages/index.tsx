@@ -1,6 +1,6 @@
-import { Conv2d } from "@/components/layers/Conv2d";
-import { Input, Output } from "@/components/layers/JustTensor";
-import { Sequential } from "@/components/Sequential";
+import { useConv2d } from "@/components/layers/Conv2d";
+import { applyInput, applyOutput } from "@/components/layers/JustTensor";
+import { useSequential } from "@/components/Sequential";
 import { Conv2dSize, Tensor } from "@/type/size";
 import { assetFullUrl, assetUrl } from "@/utils/config";
 import Head from "next/head";
@@ -10,15 +10,15 @@ export default function Home() {
   const input: Tensor<Conv2dSize> = {
     shape: [32, 1, 28, 28],
   };
-  const { layer } = Sequential([
-    Input<Conv2dSize>,
-    Conv2d(
+  const { layer: layer } = useSequential([
+    applyInput<Conv2dSize>,
+    useConv2d(
       useMemo(() => ({ in_channels: 1, out_channels: 3, kernel_size: 5 }), [])
     ),
-    Conv2d(
+    useConv2d(
       useMemo(() => ({ in_channels: 3, out_channels: 3, kernel_size: 3 }), [])
     ),
-    Output<Conv2dSize>,
+    applyOutput<Conv2dSize>,
   ])(input);
   return (
     <>
