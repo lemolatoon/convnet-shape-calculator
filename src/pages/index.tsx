@@ -4,7 +4,6 @@ import { useSequential } from "@/components/Sequential";
 import { Conv2dSize, Tensor } from "@/type/size";
 import { assetFullUrl, assetUrl } from "@/utils/config";
 import Head from "next/head";
-import { useMemo } from "react";
 
 export default function Home() {
   const input: Tensor<Conv2dSize> = {
