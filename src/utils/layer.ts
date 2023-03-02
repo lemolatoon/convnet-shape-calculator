@@ -29,9 +29,11 @@ export const forward: Forward = (layer: Layer, tensor?: Tensor<Size>) => {
       };
     case "Sequential":
       return layer.params.reduce(
-        (inputTensor, nextLayer) => forward(nextLayer, inputTensor),
+        (inputTensor, nextLayer) => forward(nextLayer.layer, inputTensor),
         tensor as Tensor<Size> | undefined
       );
+    case "JustTensor":
+      return tensor;
     default:
       exhaustiveChack(layer);
       throw new Error("unreacheable");

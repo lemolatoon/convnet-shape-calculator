@@ -1,5 +1,16 @@
-import { OnClickTypes, PrimitiveLayerParams } from "@/type/layer";
-import { displaySize, Size } from "@/type/size";
+import { useConv2d } from "@/components/layers/Conv2d";
+import { makeJustTensorApplyLayer } from "@/components/layers/JustTensor";
+import { Conv2dParams } from "@/components/layers/sizeFuncs";
+import { useSequential } from "@/components/Sequential";
+import {
+  Layer,
+  OnClickTypes,
+  PrimitiveLayerParams,
+  Render,
+  SequentialParams,
+} from "@/type/layer";
+import { displaySize, Size, Tensor } from "@/type/size";
+import { exhaustiveChack, RequiredDeep } from "@/type/util";
 import { ChangeEvent } from "react";
 import styled from "styled-components";
 
@@ -87,7 +98,7 @@ const TransparentInput = styled.input<TransparentInputProps>`
   font-size: inherit;
 `;
 
-export const Layer = <T extends string | number>({
+export const LayerBase = <T extends string | number>({
   name,
   params,
   sizeBeforeApply,
@@ -134,4 +145,33 @@ export const Layer = <T extends string | number>({
       {errorMsg ? <ErrorMessage>{errorMsg}</ErrorMessage> : undefined}
     </GridWrapper>
   );
+};
+
+export const renderLayer: Render = (
+  layer: Layer,
+  updateLayer: (layer: Layer) => void
+) => {
+  switch (layer.key) {
+    case "Conv2d":
+      return function Conv2d(tensor?: Tensor<Size>) {
+        const updateParams = (params: RequiredDeep<Conv2dParams>) =>
+          updateLayer({ key: "Conv2d", params });
+        const applyLayer = useConv2d(layer.params, updateParams);
+        return applyLayer(tensor);
+      };
+    case "Sequential":
+      return function Sequential(tensor?: Tensor<Size>) {
+        const updateParams = (params: SequentialParams) =>
+          updateLayer({ key: "Sequential", params });
+        const applyLayer = useSequential(layer.params, updateParams);
+        return applyLayer(tensor);
+      };
+    case "JustTensor":
+      return function JustTensor(tensor?: Tensor<Size>) {
+        return makeJustTensorApplyLayer(layer.params.name)(tensor);
+      };
+    default:
+      exhaustiveChack(layer);
+      throw new Error("unreacheable");
+  }
 };

@@ -1,4 +1,4 @@
-import { applyLayer } from "@/type/layer";
+import { applyLayer, SequentialParams } from "@/type/layer";
 import { Size, Tensor } from "@/type/size";
 import { MdDragIndicator } from "react-icons/md";
 import styled from "styled-components";
@@ -68,21 +68,18 @@ const SequentialLayout = ({
 };
 
 export const useSequential = <T extends Size>(
-  applyLayers: applyLayer<T>[]
+  params: SequentialParams,
+  updateParams: (params: SequentialParams) => void
 ): applyLayer<T> => {
-  const genSequentialProps = useSequentialLogic(applyLayers);
+  const genSequentialProps = useSequentialLogic(params, updateParams);
   const applyLayer = (tensor?: Tensor<T>) => {
-    const { renderLayers, tensors, handleOnDragEnd } =
-      genSequentialProps(tensor);
-    return {
-      renderLayer: () => (
-        <SequentialLayout
-          renderLayers={renderLayers}
-          handleOnDragEnd={handleOnDragEnd}
-        />
-      ),
-      tensor: tensors.slice(-1)[0],
-    };
+    const { renderLayers, handleOnDragEnd } = genSequentialProps(tensor);
+    return (
+      <SequentialLayout
+        renderLayers={renderLayers}
+        handleOnDragEnd={handleOnDragEnd}
+      />
+    );
   };
   return applyLayer;
 };

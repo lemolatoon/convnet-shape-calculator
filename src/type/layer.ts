@@ -1,5 +1,6 @@
 import { Conv2dParams } from "@/components/layers/sizeFuncs";
 import { Size, Tensor } from "@/type/size";
+import { RequiredDeep } from "@/type/util";
 import { K } from "vitest/dist/types-7cd96283";
 
 export type Value = string | number | undefined;
@@ -18,22 +19,22 @@ export type PrimitiveLayerParams<T extends Value> = Param<T>[];
 
 export type OnClickTypes = (key: number) => ((val: string) => void) | undefined;
 
-export type applyLayer<T extends Size> = (tensor?: Tensor<T>) => {
-  renderLayer: () => JSX.Element;
-  tensor?: Tensor<T>;
-};
+export type applyLayer<T extends Size> = (tensor?: Tensor<T>) => JSX.Element;
 
-export type LayerKey = "Sequential" | "Conv2d";
+export type LayerKey = "Sequential" | "Conv2d" | "JustTensor";
 type LayerFactory<K extends LayerKey, T extends ParamBase> = {
   key: K;
   params: T;
 };
 
-type SequentialLayer = LayerFactory<"Sequential", Layer[]>;
+export type SequentialParams = { layer: Layer; id: number }[];
+type SequentialLayer = LayerFactory<"Sequential", SequentialParams>;
 
-type Conv2dLayer = LayerFactory<"Conv2d", Conv2dParams>;
+type Conv2dLayer = LayerFactory<"Conv2d", RequiredDeep<Conv2dParams>>;
 
-export type Layer = SequentialLayer | Conv2dLayer;
+type JustTensorLayer = LayerFactory<"JustTensor", { name: string }>;
+
+export type Layer = SequentialLayer | Conv2dLayer | JustTensorLayer;
 
 // pureFunction
 export type Forward = (
@@ -43,4 +44,7 @@ export type Forward = (
 // pureFunction
 export type Clone = <L extends Layer>(layer: L) => L;
 // pureFunction
-export type Render = (layer: Layer) => () => JSX.Element;
+export type Render = (
+  layer: Layer,
+  updateLayer: (layer: Layer) => void
+) => (tensor?: Tensor<Size>) => JSX.Element;

@@ -1,7 +1,10 @@
 import { useConv2d } from "@/components/layers/Conv2d";
 import { applyInput, applyOutput } from "@/components/layers/JustTensor";
+import { normalizeConv2dParams } from "@/components/layers/sizeFuncs";
 import { useSequential } from "@/components/Sequential";
-import { param } from "@/type/layer";
+import { renderLayer } from "@/components/ui/Layer";
+import { normalizeSequentialParams } from "@/hooks/useSequential";
+import { Layer, param } from "@/type/layer";
 import { Conv2dSize, Size, Tensor } from "@/type/size";
 import { assetFullUrl, assetUrl } from "@/utils/config";
 import Head from "next/head";
@@ -10,28 +13,32 @@ export default function Home() {
   const input: Tensor<Size> = {
     shape: [32, 1, 28, 28],
   };
-  const conv1 = useConv2d([
-    param("in_channels", 1),
-    param("out_channels", 3),
-    param("kernel_size", 5),
-    param("stride", undefined),
-    param("padding", undefined),
-    param("dilation", undefined),
-  ]);
-  const conv2 = useConv2d([
-    param("in_channels", 3),
-    param("out_channels", 6),
-    param("kernel_size", 3),
-    param("stride", undefined),
-    param("padding", undefined),
-    param("dilation", undefined),
-  ]);
-  const { renderLayer } = useSequential<Size>([
-    applyInput,
-    conv1,
-    conv2,
-    applyOutput,
-  ])(input);
+  const conv1: Layer = {
+    key: "Conv2d",
+    params: normalizeConv2dParams([
+      param("in_channels", 1),
+      param("out_channels", 3),
+      param("kernel_size", 5),
+      param("stride", undefined),
+      param("padding", undefined),
+      param("dilation", undefined),
+    ]),
+  };
+  const conv2: Layer = {
+    key: "Conv2d",
+    params: normalizeConv2dParams([
+      param("in_channels", 3),
+      param("out_channels", 6),
+      param("kernel_size", 3),
+      param("stride", undefined),
+      param("padding", undefined),
+      param("dilation", undefined),
+    ]),
+  };
+  const Sequential: Layer = {
+    key: "Sequential",
+    params: normalizeSequentialParams([conv1, conv2]),
+  };
   return (
     <>
       <Head>
@@ -52,7 +59,7 @@ export default function Home() {
       </Head>
       <main>
         <h1>ConvNet Shape Calculator</h1>
-        {renderLayer()}
+        {renderLayer(conv1, (val) => console.log(val))(input)}
       </main>
     </>
   );

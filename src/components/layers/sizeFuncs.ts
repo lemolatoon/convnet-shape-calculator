@@ -1,4 +1,4 @@
-import { Conv2dSize, LayerFunction, Size, SizeError } from "@/type/size";
+import { LayerFunction, Size, SizeError } from "@/type/size";
 import { exhaustiveChack, RequiredDeep } from "@/type/util";
 
 export type Conv2dParams = [
@@ -57,7 +57,7 @@ export function Conv2dParamIndex(key: keyof Required<Conv2dParamsObject>) {
 export const normalizeConv2dParams = (
   params: Conv2dParams
 ): RequiredDeep<Conv2dParams> => {
-  let normalized = [...params];
+  const normalized = [...params];
   normalized[3].val = normalized[3].val ?? 1; // stride
   normalized[4].val = normalized[4].val ?? 0; // padding
   normalized[5].val = normalized[5].val ?? 1; // stride

@@ -1,12 +1,12 @@
-import {
-  conv2d,
-  Conv2dParams,
-  normalizeConv2dParams,
-} from "@/components/layers/sizeFuncs";
-import { Layer } from "@/components/ui/Layer";
+import { conv2d, Conv2dParams } from "@/components/layers/sizeFuncs";
+import { LayerBase } from "@/components/ui/Layer";
 import { useParamState } from "@/hooks/useObjectState";
-import { applyLayer as applyLayer, OnClickTypes } from "@/type/layer";
-import { Conv2dSize, Size, Tensor } from "@/type/size";
+import {
+  applyLayer as applyLayer,
+  OnClickTypes,
+  PrimitiveLayerParams,
+} from "@/type/layer";
+import { Size, Tensor } from "@/type/size";
 import { RequiredDeep } from "@/type/util";
 import { paramsHasNoNull } from "@/utils/layer";
 
@@ -14,10 +14,24 @@ const validate = (key: string, val: number) => {
   if (val < 0) throw new Error(`param (${key}) is negative: ${val}`);
 };
 
-export const useConv2d = (__params: Conv2dParams): applyLayer<Size> => {
-  const { obj: params, dispatch } = useParamState<number | "">(
-    normalizeConv2dParams(__params)
-  );
+const normalize = <T extends PrimitiveLayerParams<number>>(
+  params: PrimitiveLayerParams<number | "">
+): T => {
+  return params.map(({ name, val }) => ({
+    name,
+    val: val === "" ? 0 : val,
+  })) as T;
+};
+
+export const useConv2d = (
+  __params: RequiredDeep<Conv2dParams>,
+  updateParams: (params: RequiredDeep<Conv2dParams>) => void
+): applyLayer<Size> => {
+  const { obj: params, dispatch } = useParamState<
+    number | "",
+    number,
+    RequiredDeep<Conv2dParams>
+  >(__params, updateParams, normalize);
   const onClicks: OnClickTypes = (key) => (val) =>
     dispatch(key, val === "" ? "" : Number(val));
   const applyLayer = (tensor: Tensor<Size> | undefined) => {
@@ -40,8 +54,8 @@ export const useConv2d = (__params: Conv2dParams): applyLayer<Size> => {
         return { errorMsg: msg, sizeAfterApply: undefined };
       }
     })();
-    const renderLayer = () => (
-      <Layer
+    return (
+      <LayerBase
         name={"Conv2d"}
         params={params}
         sizeBeforeApply={tensor?.shape}
@@ -50,11 +64,6 @@ export const useConv2d = (__params: Conv2dParams): applyLayer<Size> => {
         errorMsg={errorMsg}
       />
     );
-
-    return {
-      renderLayer,
-      tensor: sizeAfterApply ? { shape: sizeAfterApply } : undefined,
-    };
   };
   return applyLayer;
 };
