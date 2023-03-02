@@ -1,4 +1,4 @@
-import { applyLayer } from "@/type/layer";
+import { applyLayer, Layer, SequentialParams } from "@/type/layer";
 import { Size, Tensor } from "@/type/size";
 import { MdDragIndicator } from "react-icons/md";
 import styled from "styled-components";
@@ -8,7 +8,12 @@ import {
   Droppable,
   OnDragEndResponder,
 } from "@hello-pangea/dnd";
-import { useSequentialLogic } from "@/hooks/useSequential";
+import {
+  normalizeSequentialParams,
+  useSequentialLogic,
+} from "@/hooks/useSequential";
+import { useState } from "react";
+import { renderLayer } from "@/components/ui/Layer";
 
 const SequentialGrid = styled.div`
   display: grid;
@@ -34,55 +39,71 @@ const SequentialLayout = ({
   renderLayers,
 }: SequentialLayoutProps) => {
   return (
-    <DragDropContext onDragEnd={handleOnDragEnd}>
-      <Droppable droppableId="tempDrappableId">
-        {(provided) => (
-          <div
-            className="tempDrappableId"
-            {...provided.droppableProps}
-            ref={provided.innerRef}
-          >
-            {renderLayers.map(({ renderLayer, id }, index) => {
-              return (
-                <Draggable key={id} draggableId={`${id}`} index={index}>
-                  {(provided) => (
-                    <SequentialGrid
-                      ref={provided.innerRef}
-                      {...provided.draggableProps}
-                      {...provided.dragHandleProps}
-                    >
-                      <IconWrappingBox>
-                        <StyledDragIndicator />
-                      </IconWrappingBox>
-                      <div>{renderLayer()}</div>
-                    </SequentialGrid>
-                  )}
-                </Draggable>
-              );
-            })}
-          </div>
-        )}
-      </Droppable>
-    </DragDropContext>
+    <div>
+      <DragDropContext onDragEnd={handleOnDragEnd}>
+        <Droppable droppableId="tempDrappableId">
+          {(provided) => (
+            <div
+              className="tempDrappableId"
+              {...provided.droppableProps}
+              ref={provided.innerRef}
+            >
+              {renderLayers.map(({ renderLayer, id }, index) => {
+                return (
+                  <Draggable key={id} draggableId={`${id}`} index={index}>
+                    {(provided) => (
+                      <SequentialGrid
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        {...provided.dragHandleProps}
+                      >
+                        <IconWrappingBox>
+                          <StyledDragIndicator />
+                        </IconWrappingBox>
+                        <div>{renderLayer()}</div>
+                      </SequentialGrid>
+                    )}
+                  </Draggable>
+                );
+              })}
+            </div>
+          )}
+        </Droppable>
+      </DragDropContext>
+    </div>
   );
 };
 
 export const useSequential = <T extends Size>(
-  applyLayers: applyLayer<T>[]
+  params: SequentialParams,
+  updateParams: (params: SequentialParams) => void
 ): applyLayer<T> => {
-  const genSequentialProps = useSequentialLogic(applyLayers);
+  const genSequentialProps = useSequentialLogic(params, updateParams);
   const applyLayer = (tensor?: Tensor<T>) => {
-    const { renderLayers, tensors, handleOnDragEnd } =
-      genSequentialProps(tensor);
-    return {
-      renderLayer: () => (
-        <SequentialLayout
-          renderLayers={renderLayers}
-          handleOnDragEnd={handleOnDragEnd}
-        />
-      ),
-      tensor: tensors.slice(-1)[0],
-    };
+    const { renderLayers, handleOnDragEnd } = genSequentialProps(tensor);
+    return (
+      <SequentialLayout
+        renderLayers={renderLayers}
+        handleOnDragEnd={handleOnDragEnd}
+      />
+    );
   };
   return applyLayer;
+};
+
+type SequentialProps = {
+  initLayers: Layer[];
+  inputTensor?: Tensor<Size>;
+};
+export const Sequential = ({ initLayers, inputTensor }: SequentialProps) => {
+  const initSequentialLayer: Layer = {
+    key: "Sequential",
+    params: normalizeSequentialParams(initLayers),
+  };
+  const [sequentialLayer, setSequentialLayer] =
+    useState<Layer>(initSequentialLayer);
+  const Sequential = renderLayer(sequentialLayer, (layer) =>
+    setSequentialLayer(layer)
+  );
+  return <Sequential tensor={inputTensor} />;
 };

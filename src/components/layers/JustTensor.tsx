@@ -1,26 +1,19 @@
-import { Layer } from "@/components/ui/Layer";
+import { LayerBase } from "@/components/ui/Layer";
 import { applyLayer } from "@/type/layer";
-import { Size, Tensor } from "@/type/size";
+import { Size } from "@/type/size";
 
-const makeJustTensorApplyLayer =
-  (name: string) =>
-  <T extends Size>(
+export const makeJustTensorApplyLayer = (name: string) => {
+  const JustTensor = <T extends Size>(
     tensor: Parameters<applyLayer<T>>[0]
   ): ReturnType<applyLayer<T>> => {
-    return {
-      renderLayer: () => (
-        <Layer
-          name={name}
-          params={{}}
-          onClicks={() => undefined}
-          sizeAfterApply={tensor?.shape}
-        />
-      ),
-      tensor,
-    };
+    return (
+      <LayerBase
+        name={name}
+        params={[]}
+        onClicks={() => undefined}
+        sizeAfterApply={tensor?.shape}
+      />
+    );
   };
-
-export const applyInput = <T extends Size>(tensor?: Tensor<T>) =>
-  makeJustTensorApplyLayer("Input")(tensor);
-export const applyOutput = <T extends Size>(tensor?: Tensor<T>) =>
-  makeJustTensorApplyLayer("Output")(tensor);
+  return JustTensor;
+};

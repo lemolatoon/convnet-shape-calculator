@@ -1,22 +1,44 @@
-import { useConv2d } from "@/components/layers/Conv2d";
-import { applyInput, applyOutput } from "@/components/layers/JustTensor";
-import { useSequential } from "@/components/Sequential";
-import { Conv2dSize, Tensor } from "@/type/size";
+import { normalizeConv2dParams } from "@/components/layers/sizeFuncs";
+import { Sequential } from "@/components/Sequential";
+import { Layer, param } from "@/type/layer";
+import { Size, Tensor } from "@/type/size";
 import { assetFullUrl, assetUrl } from "@/utils/config";
 import Head from "next/head";
 
 export default function Home() {
-  const input: Tensor<Conv2dSize> = {
+  const input: Tensor<Size> = {
     shape: [32, 1, 28, 28],
   };
-  const conv1 = useConv2d({ in_channels: 1, out_channels: 3, kernel_size: 5 });
-  const conv2 = useConv2d({ in_channels: 3, out_channels: 3, kernel_size: 3 });
-  const { renderLayer } = useSequential([
-    applyInput<Conv2dSize>,
-    conv1,
-    conv2,
-    applyOutput<Conv2dSize>,
-  ])(input);
+  const inputLayer: Layer = {
+    key: "JustTensor",
+    params: { name: "Input" },
+  };
+  const outputLayer: Layer = {
+    key: "JustTensor",
+    params: { name: "Output" },
+  };
+  const conv1: Layer = {
+    key: "Conv2d",
+    params: normalizeConv2dParams([
+      param("in_channels", 1),
+      param("out_channels", 3),
+      param("kernel_size", 5),
+      param("stride", undefined),
+      param("padding", undefined),
+      param("dilation", undefined),
+    ]),
+  };
+  const conv2: Layer = {
+    key: "Conv2d",
+    params: normalizeConv2dParams([
+      param("in_channels", 3),
+      param("out_channels", 6),
+      param("kernel_size", 3),
+      param("stride", undefined),
+      param("padding", undefined),
+      param("dilation", undefined),
+    ]),
+  };
   return (
     <>
       <Head>
@@ -37,7 +59,10 @@ export default function Home() {
       </Head>
       <main>
         <h1>ConvNet Shape Calculator</h1>
-        {renderLayer()}
+        <Sequential
+          initLayers={[inputLayer, conv1, conv2, outputLayer]}
+          inputTensor={input}
+        />
       </main>
     </>
   );
