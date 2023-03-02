@@ -1,6 +1,7 @@
 import { conv2d, normalizeConv2dParams } from "@/components/layers/sizeFuncs";
-import { Forward, Layer, PrimitiveLayerParams } from "@/type/layer";
+import { Clone, Forward, Layer, PrimitiveLayerParams } from "@/type/layer";
 import { Size, Tensor } from "@/type/size";
+import { exhaustiveChack } from "@/type/util";
 
 export const paramsHasNoNull = <
   T extends string | number,
@@ -31,5 +32,11 @@ export const forward: Forward = (layer: Layer, tensor?: Tensor<Size>) => {
         (inputTensor, nextLayer) => forward(nextLayer, inputTensor),
         tensor as Tensor<Size> | undefined
       );
+    default:
+      exhaustiveChack(layer);
+      throw new Error("unreacheable");
   }
 };
+
+export const clone: Clone = <L extends Layer>(layer: L): L =>
+  JSON.parse(JSON.stringify(layer)) as L;
