@@ -1,30 +1,31 @@
+import { PrimitiveLayerParams } from "@/type/layer";
 import { LayerFunction, Size, SizeError } from "@/type/size";
 import { exhaustiveChack, RequiredDeep } from "@/type/util";
 
 export type Conv2dParams = [
   {
     name: "in_channels";
-    val: number;
+    val: number | "";
   },
   {
     name: "out_channels";
-    val: number;
+    val: number | "";
   },
   {
     name: "kernel_size";
-    val: number;
+    val: number | "";
   },
   {
     name: "stride";
-    val?: number;
+    val?: number | "";
   },
   {
     name: "padding";
-    val?: number;
+    val?: number | "";
   },
   {
     name: "dilation";
-    val?: number;
+    val?: number | "";
   }
 ];
 type Conv2dParamsObject = {
@@ -65,15 +66,19 @@ export const normalizeConv2dParams = (
 };
 export const conv2d: (
   params: RequiredDeep<Conv2dParams>
-) => LayerFunction<Size> = ([
-  { val: in_channels },
-  { val: out_channels },
-  { val: kernel_size },
-  { val: stride },
-  { val: padding },
-  { val: dilation },
-]) => {
+) => LayerFunction<Size> = (params) => {
   const layer: LayerFunction<Size> = (size) => {
+    params.forEach(({ name, val }) => {
+      if (val === "") throw new Error(`Conv2d param(${name}) is null.`);
+    });
+    const [
+      { val: in_channels },
+      { val: out_channels },
+      { val: kernel_size },
+      { val: stride },
+      { val: padding },
+      { val: dilation },
+    ] = params as { val: number }[];
     if (size.length !== 3 && size.length !== 4)
       throw new SizeError(
         `Conv2d's input tensor's shape dimention must be 3 or 4. but got ${size.length}`
@@ -107,19 +112,19 @@ export const conv2d: (
 export type MaxPool2dParams = [
   {
     name: "kernel_size";
-    val: number;
+    val: number | "";
   },
   {
     name: "stride";
-    val?: number;
+    val?: number | "";
   },
   {
     name: "padding";
-    val?: number;
+    val?: number | "";
   },
   {
     name: "dilation";
-    val?: number;
+    val?: number | "";
   }
 ];
 export const normalizeMaxPool2dParams = (
@@ -133,13 +138,16 @@ export const normalizeMaxPool2dParams = (
 };
 
 export const maxpool2d =
-  ([
-    { val: kernel_size },
-    { val: stride },
-    { val: padding },
-    { val: dilation },
-  ]: RequiredDeep<MaxPool2dParams>) =>
-  (size: Size) => {
+  (params: RequiredDeep<MaxPool2dParams>) => (size: Size) => {
+    params.forEach(({ name, val }) => {
+      if (val === "") throw new Error(`Conv2d param(${name}) is null.`);
+    });
+    const [
+      { val: kernel_size },
+      { val: stride },
+      { val: padding },
+      { val: dilation },
+    ] = params as PrimitiveLayerParams<number>;
     if (size.length !== 3 && size.length !== 4)
       throw new SizeError(
         `Conv2d's input tensor's shape dimention must be 3 or 4. but got ${size.length}`
