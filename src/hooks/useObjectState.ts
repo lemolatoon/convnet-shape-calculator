@@ -1,16 +1,13 @@
+import { PrimitiveLayerParams, Value } from "@/type/layer";
 import { useState } from "react";
 
-type ParamObject = Record<string, number | "">;
-
-export const useObjectState = <Keys extends keyof ParamObject>(
-  init: Record<Keys, number | "">
+export const useParamState = <T extends Value>(
+  init: PrimitiveLayerParams<T>
 ) => {
   const [obj, setObj] = useState(init);
-  const dispatch = (key: Keys, val: string) => {
-    const copiedObj: Record<Keys, number | ""> = JSON.parse(
-      JSON.stringify(obj)
-    );
-    copiedObj[key] = val === "" ? ("" as const) : Number(val);
+  const dispatch = (key: number, val: T) => {
+    const copiedObj = [...obj];
+    copiedObj[key].val = val;
     setObj(copiedObj);
   };
   return { obj, dispatch };

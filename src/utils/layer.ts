@@ -1,14 +1,17 @@
 import { PrimitiveLayerParams } from "@/type/layer";
 
-export const paramsHasNoNull = <T extends PrimitiveLayerParams>(
-  params: Record<keyof T, number | "">,
-  optionalValidate?: (key: string, val: number) => void
-): params is Record<keyof T, number> => {
-  Object.entries(params).forEach(([key, val]) => {
-    if (typeof val === "string") {
-      throw new Error(`param (${key}) is null.`);
+export const paramsHasNoNull = <
+  T extends string | number,
+  U extends PrimitiveLayerParams<T>
+>(
+  params: PrimitiveLayerParams<T | "">,
+  optionalValidate?: (key: string, val: T) => void
+): params is U => {
+  params.forEach(({ name, val }) => {
+    if (typeof val === "string" && val === "") {
+      throw new Error(`param (${name}) is null.`);
     } else if (optionalValidate) {
-      optionalValidate(key, val);
+      optionalValidate(name, val);
     }
   });
   return true;

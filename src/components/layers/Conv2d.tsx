@@ -1,33 +1,34 @@
 import {
   conv2d,
-  Conv2dParamProprity,
   Conv2dParams,
   normalizeConv2dParams,
 } from "@/components/layers/sizeFuncs";
 import { Layer } from "@/components/ui/Layer";
-import { useObjectState } from "@/hooks/useObjectState";
+import { useParamState } from "@/hooks/useObjectState";
 import { applyLayer as applyLayer, OnClickTypes } from "@/type/layer";
 import { Conv2dSize, Tensor } from "@/type/size";
+import { RequiredDeep } from "@/type/util";
 import { paramsHasNoNull } from "@/utils/layer";
-import { addPriority } from "@/utils/object";
 
 const validate = (key: string, val: number) => {
   if (val < 0) throw new Error(`param (${key}) is negative: ${val}`);
 };
 
 export const useConv2d = (__params: Conv2dParams): applyLayer<Conv2dSize> => {
-  const { obj: params, dispatch } = useObjectState(
+  const { obj: params, dispatch } = useParamState<number | "">(
     normalizeConv2dParams(__params)
   );
-  const onClicks: OnClickTypes<Conv2dParams> = (key) => (val) =>
-    dispatch(key, val);
+  const onClicks: OnClickTypes = (key) => (val) =>
+    dispatch(key, val === "" ? "" : Number(val));
   const applyLayer = (tensor: Tensor<Conv2dSize> | undefined) => {
     const { sizeAfterApply, errorMsg } = (() => {
       if (!tensor) {
         return { sizeAfterApply: undefined, errorMsg: undefined };
       }
       try {
-        if (!paramsHasNoNull<Conv2dParams>(params, validate))
+        if (
+          !paramsHasNoNull<number, RequiredDeep<Conv2dParams>>(params, validate)
+        )
           throw new Error("unreachable");
         const { layer: conv2dF } = conv2d(params);
         return { sizeAfterApply: conv2dF(tensor.shape), errorMsg: undefined };
@@ -42,7 +43,7 @@ export const useConv2d = (__params: Conv2dParams): applyLayer<Conv2dSize> => {
     const renderLayer = () => (
       <Layer
         name={"Conv2d"}
-        params={addPriority(params, Conv2dParamProprity)}
+        params={params}
         sizeBeforeApply={tensor?.shape}
         sizeAfterApply={sizeAfterApply}
         onClicks={onClicks}

@@ -11,7 +11,7 @@ const makeJustTensorApplyLayer =
       renderLayer: () => (
         <Layer
           name={name}
-          params={{}}
+          params={[]}
           onClicks={() => undefined}
           sizeAfterApply={tensor?.shape}
         />

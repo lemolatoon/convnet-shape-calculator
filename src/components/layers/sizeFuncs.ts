@@ -1,7 +1,33 @@
 import { Conv2dSize, LayerFunction, SizeError } from "@/type/size";
-import { exhaustiveChack } from "@/type/util";
+import { exhaustiveChack, RequiredDeep } from "@/type/util";
 
-export type Conv2dParams = {
+export type Conv2dParams = [
+  {
+    name: "in_channels";
+    val: number;
+  },
+  {
+    name: "out_channels";
+    val: number;
+  },
+  {
+    name: "kernel_size";
+    val: number;
+  },
+  {
+    name: "stride";
+    val?: number;
+  },
+  {
+    name: "padding";
+    val?: number;
+  },
+  {
+    name: "dilation";
+    val?: number;
+  }
+];
+type Conv2dParamsObject = {
   in_channels: number;
   out_channels: number;
   kernel_size: number;
@@ -9,7 +35,7 @@ export type Conv2dParams = {
   padding?: number;
   dilation?: number;
 };
-export function Conv2dParamProprity(key: keyof Required<Conv2dParams>) {
+export function Conv2dParamIndex(key: keyof Required<Conv2dParamsObject>) {
   switch (key) {
     case "in_channels":
       return 0;
@@ -30,18 +56,23 @@ export function Conv2dParamProprity(key: keyof Required<Conv2dParams>) {
 }
 export const normalizeConv2dParams = (
   params: Conv2dParams
-): Required<Conv2dParams> => {
-  const passingParams: Required<Conv2dParams> = {
-    stride: params.stride ?? 1,
-    padding: params.padding ?? 0,
-    dilation: params.dilation ?? 1,
-    ...params,
-  };
-  return passingParams;
+): RequiredDeep<Conv2dParams> => {
+  const normalized = [...params];
+  normalized[3].val = normalized[3].val ?? 1; // stride
+  normalized[4].val = normalized[4].val ?? 0; // padding
+  normalized[5].val = normalized[5].val ?? 1; // stride
+  return normalized as RequiredDeep<Conv2dParams>;
 };
-export const conv2d: (params: Required<Conv2dParams>) => {
+export const conv2d: (params: RequiredDeep<Conv2dParams>) => {
   layer: LayerFunction<Conv2dSize>;
-} = ({ in_channels, out_channels, kernel_size, stride, padding, dilation }) => {
+} = ([
+  { val: in_channels },
+  { val: out_channels },
+  { val: kernel_size },
+  { val: stride },
+  { val: padding },
+  { val: dilation },
+]) => {
   const layer: LayerFunction<Conv2dSize> = (size) => {
     const { c_in, h_in, w_in } =
       size[3] !== undefined
