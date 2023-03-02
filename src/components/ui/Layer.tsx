@@ -16,6 +16,7 @@ import { exhaustiveChack, RequiredDeep } from "@/type/util";
 import { ChangeEvent } from "react";
 import styled from "styled-components";
 import { BiDuplicate } from "react-icons/bi";
+import { TiDelete } from "react-icons/ti";
 import { clone } from "@/utils/layer";
 
 export type LayerProps<T extends string | number | undefined> = {
@@ -155,11 +156,20 @@ const StyledDuplicateButton = styled(BiDuplicate)`
   cursor: pointer;
   font-size: 2em;
 `;
+
+const StyledDeleteButton = styled(TiDelete)`
+  cursor: pointer;
+  font-size: 2em;
+`;
+const ButtonBox = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
 const LayerWrapper = styled.div``;
 const LayerHOCBox = styled.div`
   display: grid;
   grid-template-columns: auto 1fr;
-  > ${StyledDuplicateButton} {
+  > ${ButtonBox} {
     grid-row-start: 0;
     grid-row-end: 1;
     grid-column-start: 0;
@@ -169,20 +179,24 @@ const LayerHOCBox = styled.div`
   > ${LayerWrapper} {
     grid-row-start: 0;
     grid-row-end: 1;
-    grid-column-start: 2;
-    grid-column-end: 3;
+    grid-column-start: 1;
+    grid-column-end: 2;
   }
 `;
 
 const AddCommonsAlongAllLayers = (
   PureLayer: LayerComponent,
-  onDuplicate?: () => void
+  onDuplicate?: () => void,
+  onDelete?: () => void
 ): LayerComponent =>
   function AppliedLayer({ tensor }: RenderProps) {
-    if (!onDuplicate) return <PureLayer tensor={tensor} />;
+    if (!onDuplicate && !onDelete) return <PureLayer tensor={tensor} />;
     return (
       <LayerHOCBox>
-        <StyledDuplicateButton onClick={onDuplicate} />
+        <ButtonBox>
+          {onDuplicate && <StyledDuplicateButton onClick={onDuplicate} />}
+          {onDelete && <StyledDeleteButton onClick={onDelete} />}
+        </ButtonBox>
         <LayerWrapper>
           <PureLayer tensor={tensor} />
         </LayerWrapper>
@@ -193,7 +207,8 @@ const AddCommonsAlongAllLayers = (
 export const renderLayer: Render = (
   layer: Layer,
   updateLayer: (layer: Layer) => void,
-  addLayer?: (layer: Layer) => void
+  addLayer?: (layer: Layer) => void,
+  deleteLayer?: () => void
 ) => {
   const PureLayer = (() => {
     switch (layer.key) {
@@ -220,6 +235,11 @@ export const renderLayer: Render = (
         throw new Error("unreacheable");
     }
   })();
-  const onDuplicate = addLayer ? () => addLayer(clone(layer)) : undefined;
-  return AddCommonsAlongAllLayers(PureLayer, onDuplicate);
+  const onDuplicate =
+    addLayer && layer.noDuplicate !== true
+      ? () => addLayer(clone(layer))
+      : undefined;
+  const onDelete =
+    deleteLayer && layer.noDelete !== true ? () => deleteLayer() : undefined;
+  return AddCommonsAlongAllLayers(PureLayer, onDuplicate, onDelete);
 };

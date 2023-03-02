@@ -38,9 +38,21 @@ export const useSequentialLogic = (
           });
           updateParams(copiedParams);
         };
+        const deleteLayer = () => {
+          const copiedParams: typeof params = JSON.parse(
+            JSON.stringify(params)
+          );
+          copiedParams.splice(idx, 1);
+          updateParams(copiedParams);
+        };
         const currentTensor = tensors.slice(-1)[0];
         const renderCurrrentLayer = () =>
-          renderLayer(layer, updateLayer, addLayer)({ tensor: currentTensor });
+          renderLayer(
+            layer,
+            updateLayer,
+            addLayer,
+            deleteLayer
+          )({ tensor: currentTensor });
         const nextTensor = forward(layer, currentTensor);
         return {
           renderLayers: [
