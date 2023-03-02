@@ -12,7 +12,7 @@ import {
   normalizeSequentialParams,
   useSequentialLogic,
 } from "@/hooks/useSequential";
-import { useState } from "react";
+import { useId, useState } from "react";
 import { renderLayer } from "@/components/ui/Layer";
 
 const SequentialGrid = styled.div`
@@ -30,6 +30,12 @@ const StyledDragIndicator = styled(MdDragIndicator)`
   font-size: 2rem;
 `;
 
+const SequentialWrapper = styled.div`
+  padding: 10px;
+  border-radius: 10px;
+  border: solid;
+`;
+
 type SequentialLayoutProps = {
   handleOnDragEnd: OnDragEndResponder;
   renderLayers: { renderLayer: () => JSX.Element; id: number }[];
@@ -38,13 +44,14 @@ const SequentialLayout = ({
   handleOnDragEnd,
   renderLayers,
 }: SequentialLayoutProps) => {
+  const droppableId = useId();
   return (
-    <div>
+    <SequentialWrapper>
       <DragDropContext onDragEnd={handleOnDragEnd}>
-        <Droppable droppableId="tempDrappableId">
+        <Droppable droppableId={droppableId}>
           {(provided) => (
             <div
-              className="tempDrappableId"
+              className={droppableId}
               {...provided.droppableProps}
               ref={provided.innerRef}
             >
@@ -66,11 +73,12 @@ const SequentialLayout = ({
                   </Draggable>
                 );
               })}
+              {provided.placeholder}
             </div>
           )}
         </Droppable>
       </DragDropContext>
-    </div>
+    </SequentialWrapper>
   );
 };
 

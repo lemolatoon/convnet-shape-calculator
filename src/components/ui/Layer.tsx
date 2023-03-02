@@ -47,7 +47,7 @@ const LayerParamBox = styled.div`
 const LayerParam = styled.div`
   display: flex;
 `;
-const ErrorMessage = styled.text`
+const ErrorMessage = styled.div`
   align-self: flex-end;
   color: red;
 `;
