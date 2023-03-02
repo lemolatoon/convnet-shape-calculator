@@ -1,7 +1,7 @@
-import { conv2d, Conv2dParams } from "@/components/layers/sizeFuncs";
+import { maxpool2d, MaxPool2dParams } from "@/components/layers/sizeFuncs";
 import { LayerBase } from "@/components/ui/Layer";
 import { useParamState } from "@/hooks/useObjectState";
-import { applyLayer, OnClickTypes, PrimitiveLayerParams } from "@/type/layer";
+import { PrimitiveLayerParams, applyLayer, OnClickTypes } from "@/type/layer";
 import { Size, Tensor } from "@/type/size";
 import { RequiredDeep } from "@/type/util";
 import { paramsHasNoNull } from "@/utils/layer";
@@ -19,14 +19,14 @@ const normalize = <T extends PrimitiveLayerParams<number>>(
   })) as T;
 };
 
-export const useConv2d = (
-  __params: RequiredDeep<Conv2dParams>,
-  updateParams: (params: RequiredDeep<Conv2dParams>) => void
+export const useMaxPool2d = (
+  __params: RequiredDeep<MaxPool2dParams>,
+  updateParams: (params: RequiredDeep<MaxPool2dParams>) => void
 ): applyLayer<Size> => {
   const { obj: params, dispatch } = useParamState<
     number | "",
     number,
-    RequiredDeep<Conv2dParams>
+    RequiredDeep<MaxPool2dParams>
   >(__params, updateParams, normalize);
   const onClicks: OnClickTypes = (key) => (val) =>
     dispatch(key, val === "" ? "" : Number(val));
@@ -37,11 +37,17 @@ export const useConv2d = (
       }
       try {
         if (
-          !paramsHasNoNull<number, RequiredDeep<Conv2dParams>>(params, validate)
+          !paramsHasNoNull<number, RequiredDeep<MaxPool2dParams>>(
+            params,
+            validate
+          )
         )
           throw new Error("unreachable");
-        const conv2dF = conv2d(params);
-        return { sizeAfterApply: conv2dF(tensor.shape), errorMsg: undefined };
+        const maxpool2dF = maxpool2d(params);
+        return {
+          sizeAfterApply: maxpool2dF(tensor.shape),
+          errorMsg: undefined,
+        };
       } catch (e: unknown) {
         let msg = "Unknown Error Occured";
         if (e instanceof Error) {
@@ -52,7 +58,7 @@ export const useConv2d = (
     })();
     return (
       <LayerBase
-        name={"Conv2d"}
+        name={"MaxPool2d"}
         params={params}
         sizeBeforeApply={tensor?.shape}
         sizeAfterApply={sizeAfterApply}

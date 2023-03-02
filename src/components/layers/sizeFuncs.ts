@@ -63,9 +63,9 @@ export const normalizeConv2dParams = (
   normalized[5].val = normalized[5].val ?? 1; // stride
   return normalized as RequiredDeep<Conv2dParams>;
 };
-export const conv2d: (params: RequiredDeep<Conv2dParams>) => {
-  layer: LayerFunction<Size>;
-} = ([
+export const conv2d: (
+  params: RequiredDeep<Conv2dParams>
+) => LayerFunction<Size> = ([
   { val: in_channels },
   { val: out_channels },
   { val: kernel_size },
@@ -101,7 +101,7 @@ export const conv2d: (params: RequiredDeep<Conv2dParams>) => {
       return [...features];
     }
   };
-  return { layer };
+  return layer;
 };
 
 export type MaxPool2dParams = [
@@ -120,14 +120,6 @@ export type MaxPool2dParams = [
   {
     name: "dilation";
     val?: number;
-  },
-  {
-    name: "return_indices";
-    val?: boolean;
-  },
-  {
-    name: "ceil_mode";
-    val?: boolean;
   }
 ];
 export const normalizeMaxPool2dParams = (
@@ -137,8 +129,6 @@ export const normalizeMaxPool2dParams = (
   normalized[1].val = normalized[1].val ?? normalized[0].val; // stride
   normalized[2].val = normalized[2].val ?? 0; // padding
   normalized[3].val = normalized[3].val ?? 1; // dilation
-  normalized[4].val = normalized[4].val ?? false; // dilation
-  normalized[5].val = normalized[5].val ?? false; // ceil_mode
   return normalized as RequiredDeep<MaxPool2dParams>;
 };
 
@@ -148,10 +138,6 @@ export const maxpool2d =
     { val: stride },
     { val: padding },
     { val: dilation },
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    { val: _return_indices },
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    { val: _ceil_mode },
   ]: RequiredDeep<MaxPool2dParams>) =>
   (size: Size) => {
     if (size.length !== 3 && size.length !== 4)

@@ -2,7 +2,7 @@ import { Conv2dParams, MaxPool2dParams } from "@/components/layers/sizeFuncs";
 import { Size, Tensor } from "@/type/size";
 import { RequiredDeep } from "@/type/util";
 
-export type Value = string | number | undefined;
+export type Value = string | number | boolean | undefined;
 type Param<T extends Value> = {
   name: string;
   val: T;
@@ -15,6 +15,10 @@ export const param = <Name extends string, T extends Value>(
 
 export type ParamBase = object;
 export type PrimitiveLayerParams<T extends Value> = Param<T>[];
+
+export type MapParam<T extends PrimitiveLayerParams<Value>> = {
+  [K in keyof T]: { name: T[K]["name"]; val: string };
+};
 
 export type OnClickTypes = (key: number) => ((val: string) => void) | undefined;
 
