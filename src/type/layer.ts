@@ -24,6 +24,8 @@ export type LayerKey = "Sequential" | "Conv2d" | "JustTensor";
 type LayerFactory<K extends LayerKey, T extends ParamBase> = {
   key: K;
   params: T;
+  noDelete?: boolean;
+  noDuplicate?: boolean;
 };
 
 export type SequentialParams = { layer: Layer; id: number }[];
@@ -51,5 +53,6 @@ export type LayerComponent = (props: RenderProps) => JSX.Element;
 export type Render = (
   layer: Layer,
   updateLayer: (layer: Layer) => void,
-  addLayer?: (layer: Layer) => void
+  addLayer?: (layer: Layer) => void,
+  deleteLayer?: () => void
 ) => LayerComponent;

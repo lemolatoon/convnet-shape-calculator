@@ -12,10 +12,14 @@ export default function Home() {
   const inputLayer: Layer = {
     key: "JustTensor",
     params: { name: "Input" },
+    noDelete: true,
+    noDuplicate: true,
   };
   const outputLayer: Layer = {
     key: "JustTensor",
     params: { name: "Output" },
+    noDelete: true,
+    noDuplicate: true,
   };
   const conv1: Layer = {
     key: "Conv2d",
