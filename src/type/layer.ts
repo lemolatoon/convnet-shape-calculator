@@ -28,7 +28,13 @@ export type OnClickTypes = (key: number) => ((val: string) => void) | undefined;
 
 export type applyLayer<T extends Size> = (tensor?: Tensor<T>) => JSX.Element;
 
-export type LayerKey = "Sequential" | "Conv2d" | "JustTensor" | "MaxPool2d";
+export const layerKeys = [
+  "Sequential",
+  "Conv2d",
+  "JustTensor",
+  "MaxPool2d",
+] as const;
+export type LayerKey = (typeof layerKeys)[number];
 type LayerFactory<K extends LayerKey, T extends ParamBase> = {
   key: K;
   params: T;
