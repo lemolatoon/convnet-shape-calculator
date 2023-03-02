@@ -1,11 +1,9 @@
 import { normalizeConv2dParams } from "@/components/layers/sizeFuncs";
-import { renderLayer } from "@/components/ui/Layer";
-import { normalizeSequentialParams } from "@/hooks/useSequential";
+import { Sequential } from "@/components/Sequential";
 import { Layer, param } from "@/type/layer";
 import { Size, Tensor } from "@/type/size";
 import { assetFullUrl, assetUrl } from "@/utils/config";
 import Head from "next/head";
-import { useState } from "react";
 
 export default function Home() {
   const input: Tensor<Size> = {
@@ -41,15 +39,6 @@ export default function Home() {
       param("dilation", undefined),
     ]),
   };
-  const initSequentialLayer: Layer = {
-    key: "Sequential",
-    params: normalizeSequentialParams([inputLayer, conv1, conv2, outputLayer]),
-  };
-  const [sequentialLayer, setSequentialLayer] =
-    useState<Layer>(initSequentialLayer);
-  const Sequential = renderLayer(sequentialLayer, (layer) =>
-    setSequentialLayer(layer)
-  );
   return (
     <>
       <Head>
@@ -70,7 +59,10 @@ export default function Home() {
       </Head>
       <main>
         <h1>ConvNet Shape Calculator</h1>
-        <Sequential tensor={input} />
+        <Sequential
+          initLayers={[inputLayer, conv1, conv2, outputLayer]}
+          inputTensor={input}
+        />
       </main>
     </>
   );

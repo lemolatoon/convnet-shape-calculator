@@ -1,4 +1,4 @@
-import { applyLayer, SequentialParams } from "@/type/layer";
+import { applyLayer, Layer, SequentialParams } from "@/type/layer";
 import { Size, Tensor } from "@/type/size";
 import { MdDragIndicator } from "react-icons/md";
 import styled from "styled-components";
@@ -8,7 +8,12 @@ import {
   Droppable,
   OnDragEndResponder,
 } from "@hello-pangea/dnd";
-import { useSequentialLogic } from "@/hooks/useSequential";
+import {
+  normalizeSequentialParams,
+  useSequentialLogic,
+} from "@/hooks/useSequential";
+import { useState } from "react";
+import { renderLayer } from "@/components/ui/Layer";
 
 const SequentialGrid = styled.div`
   display: grid;
@@ -82,4 +87,21 @@ export const useSequential = <T extends Size>(
     );
   };
   return applyLayer;
+};
+
+type SequentialProps = {
+  initLayers: Layer[];
+  inputTensor?: Tensor<Size>;
+};
+export const Sequential = ({ initLayers, inputTensor }: SequentialProps) => {
+  const initSequentialLayer: Layer = {
+    key: "Sequential",
+    params: normalizeSequentialParams(initLayers),
+  };
+  const [sequentialLayer, setSequentialLayer] =
+    useState<Layer>(initSequentialLayer);
+  const Sequential = renderLayer(sequentialLayer, (layer) =>
+    setSequentialLayer(layer)
+  );
+  return <Sequential tensor={inputTensor} />;
 };
