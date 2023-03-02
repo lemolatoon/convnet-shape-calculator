@@ -4,7 +4,15 @@ import {
   normalizeConv2dParams,
   normalizeMaxPool2dParams,
 } from "@/components/layers/sizeFuncs";
-import { Clone, Forward, Layer, PrimitiveLayerParams } from "@/type/layer";
+import { normalizeSequentialParams } from "@/hooks/useSequential";
+import {
+  Clone,
+  Forward,
+  Layer,
+  LayerKey,
+  param,
+  PrimitiveLayerParams,
+} from "@/type/layer";
 import { Size, Tensor } from "@/type/size";
 import { exhaustiveChack } from "@/type/util";
 
@@ -57,3 +65,40 @@ export const forward: Forward = (layer: Layer, tensor?: Tensor<Size>) => {
 
 export const clone: Clone = <L extends Layer>(layer: L): L =>
   JSON.parse(JSON.stringify(layer)) as L;
+
+export const defaultLayer = <K extends LayerKey>(key: K): Layer => {
+  switch (key) {
+    case "Conv2d":
+      return {
+        key,
+        params: normalizeConv2dParams([
+          param("in_channels", 1),
+          param("out_channels", 3),
+          param("kernel_size", 3),
+          param("stride", undefined),
+          param("padding", undefined),
+          param("dilation", undefined),
+        ]),
+      };
+    case "MaxPool2d":
+      return {
+        key,
+        params: normalizeMaxPool2dParams([
+          param("kernel_size", 3),
+          param("stride", undefined),
+          param("padding", undefined),
+          param("dilation", undefined),
+        ]),
+      };
+    case "JustTensor":
+      return { key, params: { name: "Tensor's name" } };
+    case "Sequential":
+      return {
+        key,
+        params: normalizeSequentialParams([defaultLayer("Conv2d")]),
+      };
+    default:
+      exhaustiveChack(key);
+      throw new Error("unreacheable");
+  }
+};

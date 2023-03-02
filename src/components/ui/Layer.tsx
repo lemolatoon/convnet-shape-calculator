@@ -13,12 +13,15 @@ import {
 } from "@/type/layer";
 import { displaySize, Size } from "@/type/size";
 import { exhaustiveChack, RequiredDeep } from "@/type/util";
-import { ChangeEvent } from "react";
+import { ChangeEvent, useState } from "react";
 import styled from "styled-components";
 import { BiDuplicate } from "react-icons/bi";
 import { TiDelete } from "react-icons/ti";
+import { MdCreateNewFolder } from "react-icons/md";
 import { clone } from "@/utils/layer";
 import { useMaxPool2d } from "@/components/layers/MaxPool2d";
+import { CenteredModal } from "@/components/ui/Modal";
+import { CreateLayer } from "@/components/CreateLayer";
 
 export type LayerProps<T extends string | number | undefined> = {
   name: string;
@@ -180,6 +183,17 @@ const StyledDuplicateButton = styled(BiDuplicate)`
 
 const StyledDeleteButton = styled(TiDelete)`
   cursor: pointer;
+  @media (max-width: 767px) {
+    font-size: 16px;
+  }
+  @media (min-width: 767px) and (max-width: 1200px) {
+    font-size: 32px;
+  }
+  @media (min-width: 1200px) {
+    font-size: 2em;
+  }
+`;
+const StyledCreateButton = styled(MdCreateNewFolder)`
   cursor: pointer;
   @media (max-width: 767px) {
     font-size: 16px;
@@ -217,15 +231,29 @@ const LayerHOCBox = styled.div`
 const AddCommonsAlongAllLayers = (
   PureLayer: LayerComponent,
   onDuplicate?: () => void,
-  onDelete?: () => void
+  onDelete?: () => void,
+  onAddNewLayer?: (layer: Layer) => void
 ): LayerComponent =>
   function AppliedLayer({ tensor }: RenderProps) {
+    const [modalShow, setModalShow] = useState(false);
     if (!onDuplicate && !onDelete) return <PureLayer tensor={tensor} />;
     return (
       <LayerHOCBox>
         <ButtonBox>
           {onDuplicate && <StyledDuplicateButton onClick={onDuplicate} />}
           {onDelete && <StyledDeleteButton onClick={onDelete} />}
+          {onAddNewLayer && (
+            <>
+              <StyledCreateButton onClick={() => setModalShow(true)} />
+              <CenteredModal show={modalShow} close={() => setModalShow(false)}>
+                <CreateLayer
+                  addNewLayer={(layer: Layer) => {
+                    onAddNewLayer(layer);
+                  }}
+                />
+              </CenteredModal>
+            </>
+          )}
         </ButtonBox>
         <LayerWrapper>
           <PureLayer tensor={tensor} />
@@ -278,5 +306,5 @@ export const renderLayer: Render = (
       : undefined;
   const onDelete =
     deleteLayer && layer.noDelete !== true ? () => deleteLayer() : undefined;
-  return AddCommonsAlongAllLayers(PureLayer, onDuplicate, onDelete);
+  return AddCommonsAlongAllLayers(PureLayer, onDuplicate, onDelete, addLayer);
 };
