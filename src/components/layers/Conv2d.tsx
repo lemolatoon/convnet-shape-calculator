@@ -6,7 +6,7 @@ import {
 import { Layer } from "@/components/ui/Layer";
 import { useParamState } from "@/hooks/useObjectState";
 import { applyLayer as applyLayer, OnClickTypes } from "@/type/layer";
-import { Conv2dSize, Tensor } from "@/type/size";
+import { Conv2dSize, Size, Tensor } from "@/type/size";
 import { RequiredDeep } from "@/type/util";
 import { paramsHasNoNull } from "@/utils/layer";
 
@@ -14,13 +14,13 @@ const validate = (key: string, val: number) => {
   if (val < 0) throw new Error(`param (${key}) is negative: ${val}`);
 };
 
-export const useConv2d = (__params: Conv2dParams): applyLayer<Conv2dSize> => {
+export const useConv2d = (__params: Conv2dParams): applyLayer<Size> => {
   const { obj: params, dispatch } = useParamState<number | "">(
     normalizeConv2dParams(__params)
   );
   const onClicks: OnClickTypes = (key) => (val) =>
     dispatch(key, val === "" ? "" : Number(val));
-  const applyLayer = (tensor: Tensor<Conv2dSize> | undefined) => {
+  const applyLayer = (tensor: Tensor<Size> | undefined) => {
     const { sizeAfterApply, errorMsg } = (() => {
       if (!tensor) {
         return { sizeAfterApply: undefined, errorMsg: undefined };

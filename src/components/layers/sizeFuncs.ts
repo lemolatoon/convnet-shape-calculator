@@ -1,4 +1,4 @@
-import { Conv2dSize, LayerFunction, SizeError } from "@/type/size";
+import { Conv2dSize, LayerFunction, Size, SizeError } from "@/type/size";
 import { exhaustiveChack, RequiredDeep } from "@/type/util";
 
 export type Conv2dParams = [
@@ -57,14 +57,14 @@ export function Conv2dParamIndex(key: keyof Required<Conv2dParamsObject>) {
 export const normalizeConv2dParams = (
   params: Conv2dParams
 ): RequiredDeep<Conv2dParams> => {
-  const normalized = [...params];
+  let normalized = [...params];
   normalized[3].val = normalized[3].val ?? 1; // stride
   normalized[4].val = normalized[4].val ?? 0; // padding
   normalized[5].val = normalized[5].val ?? 1; // stride
   return normalized as RequiredDeep<Conv2dParams>;
 };
 export const conv2d: (params: RequiredDeep<Conv2dParams>) => {
-  layer: LayerFunction<Conv2dSize>;
+  layer: LayerFunction<Size>;
 } = ([
   { val: in_channels },
   { val: out_channels },
@@ -73,7 +73,11 @@ export const conv2d: (params: RequiredDeep<Conv2dParams>) => {
   { val: padding },
   { val: dilation },
 ]) => {
-  const layer: LayerFunction<Conv2dSize> = (size) => {
+  const layer: LayerFunction<Size> = (size) => {
+    if (size.length !== 3 && size.length !== 4)
+      throw new SizeError(
+        `Conv2d's input tensor's shape dimention must be 3 or 4. but got ${size.length}`
+      );
     const { c_in, h_in, w_in } =
       size[3] !== undefined
         ? { c_in: size[1], h_in: size[2], w_in: size[3] }

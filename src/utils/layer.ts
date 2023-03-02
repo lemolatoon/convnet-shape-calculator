@@ -1,4 +1,6 @@
-import { PrimitiveLayerParams } from "@/type/layer";
+import { conv2d, normalizeConv2dParams } from "@/components/layers/sizeFuncs";
+import { Forward, Layer, PrimitiveLayerParams } from "@/type/layer";
+import { Size, Tensor } from "@/type/size";
 
 export const paramsHasNoNull = <
   T extends string | number,
@@ -15,4 +17,19 @@ export const paramsHasNoNull = <
     }
   });
   return true;
+};
+
+export const forward: Forward = (layer: Layer, tensor?: Tensor<Size>) => {
+  if (!tensor) return undefined;
+  switch (layer.key) {
+    case "Conv2d":
+      return {
+        shape: conv2d(normalizeConv2dParams(layer.params)).layer(tensor.shape),
+      };
+    case "Sequential":
+      return layer.params.reduce(
+        (inputTensor, nextLayer) => forward(nextLayer, inputTensor),
+        tensor as Tensor<Size> | undefined
+      );
+  }
 };

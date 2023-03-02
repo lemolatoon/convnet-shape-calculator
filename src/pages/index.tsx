@@ -2,12 +2,12 @@ import { useConv2d } from "@/components/layers/Conv2d";
 import { applyInput, applyOutput } from "@/components/layers/JustTensor";
 import { useSequential } from "@/components/Sequential";
 import { param } from "@/type/layer";
-import { Conv2dSize, Tensor } from "@/type/size";
+import { Conv2dSize, Size, Tensor } from "@/type/size";
 import { assetFullUrl, assetUrl } from "@/utils/config";
 import Head from "next/head";
 
 export default function Home() {
-  const input: Tensor<Conv2dSize> = {
+  const input: Tensor<Size> = {
     shape: [32, 1, 28, 28],
   };
   const conv1 = useConv2d([
@@ -26,11 +26,11 @@ export default function Home() {
     param("padding", undefined),
     param("dilation", undefined),
   ]);
-  const { renderLayer } = useSequential([
-    applyInput<Conv2dSize>,
+  const { renderLayer } = useSequential<Size>([
+    applyInput,
     conv1,
     conv2,
-    applyOutput<Conv2dSize>,
+    applyOutput,
   ])(input);
   return (
     <>
