@@ -46,8 +46,9 @@ export type Clone = <L extends Layer>(layer: L) => L;
 export type RenderProps = {
   tensor?: Tensor<Size>;
 };
+export type LayerComponent = (props: RenderProps) => JSX.Element;
 // pureFunction
 export type Render = (
   layer: Layer,
   updateLayer: (layer: Layer) => void
-) => (props: RenderProps) => JSX.Element;
+) => LayerComponent;

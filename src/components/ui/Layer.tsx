@@ -4,15 +4,18 @@ import { Conv2dParams } from "@/components/layers/sizeFuncs";
 import { useSequential } from "@/components/Sequential";
 import {
   Layer,
+  LayerComponent,
   OnClickTypes,
   PrimitiveLayerParams,
   Render,
+  RenderProps,
   SequentialParams,
 } from "@/type/layer";
 import { displaySize, Size } from "@/type/size";
 import { exhaustiveChack, RequiredDeep } from "@/type/util";
 import { ChangeEvent } from "react";
 import styled from "styled-components";
+import { BiDuplicate } from "react-icons/bi";
 
 export type LayerProps<T extends string | number | undefined> = {
   name: string;
@@ -147,31 +150,69 @@ export const LayerBase = <T extends string | number>({
   );
 };
 
+const StyledDuplicateButton = styled(BiDuplicate)`
+  cursor: pointer;
+  font-size: 2em;
+`;
+const LayerWrapper = styled.div``;
+const LayerHOCBox = styled.div`
+  display: grid;
+  grid-template-columns: auto 1fr;
+  > ${StyledDuplicateButton} {
+    grid-row-start: 0;
+    grid-row-end: 1;
+    grid-column-start: 0;
+    grid-column-end: 1;
+  }
+
+  > ${LayerWrapper} {
+    grid-row-start: 0;
+    grid-row-end: 1;
+    grid-column-start: 2;
+    grid-column-end: 3;
+  }
+`;
+
+const AddCommonsAlongAllLayers = (PureLayer: LayerComponent): LayerComponent =>
+  function AppliedLayer({ tensor }: RenderProps) {
+    return (
+      <LayerHOCBox>
+        <StyledDuplicateButton />
+        <LayerWrapper>
+          <PureLayer tensor={tensor} />
+        </LayerWrapper>
+      </LayerHOCBox>
+    );
+  };
+
 export const renderLayer: Render = (
   layer: Layer,
   updateLayer: (layer: Layer) => void
 ) => {
-  switch (layer.key) {
-    case "Conv2d":
-      return function Conv2d({ tensor }) {
-        const updateParams = (params: RequiredDeep<Conv2dParams>) =>
-          updateLayer({ key: "Conv2d", params });
-        const applyLayer = useConv2d(layer.params, updateParams);
-        return applyLayer(tensor);
-      };
-    case "Sequential":
-      return function Sequential({ tensor }) {
-        const updateParams = (params: SequentialParams) =>
-          updateLayer({ key: "Sequential", params });
-        const applyLayer = useSequential(layer.params, updateParams);
-        return applyLayer(tensor);
-      };
-    case "JustTensor":
-      return function JustTensor({ tensor }) {
-        return makeJustTensorApplyLayer(layer.params.name)(tensor);
-      };
-    default:
-      exhaustiveChack(layer);
-      throw new Error("unreacheable");
-  }
+  const PureLayer = (() => {
+    switch (layer.key) {
+      case "Conv2d":
+        return function Conv2d({ tensor }: RenderProps) {
+          const updateParams = (params: RequiredDeep<Conv2dParams>) =>
+            updateLayer({ key: "Conv2d", params });
+          const applyLayer = useConv2d(layer.params, updateParams);
+          return applyLayer(tensor);
+        };
+      case "Sequential":
+        return function Sequential({ tensor }: RenderProps) {
+          const updateParams = (params: SequentialParams) =>
+            updateLayer({ key: "Sequential", params });
+          const applyLayer = useSequential(layer.params, updateParams);
+          return applyLayer(tensor);
+        };
+      case "JustTensor":
+        return function JustTensor({ tensor }: RenderProps) {
+          return makeJustTensorApplyLayer(layer.params.name)(tensor);
+        };
+      default:
+        exhaustiveChack(layer);
+        throw new Error("unreacheable");
+    }
+  })();
+  return AddCommonsAlongAllLayers(PureLayer);
 };

@@ -39,36 +39,38 @@ const SequentialLayout = ({
   renderLayers,
 }: SequentialLayoutProps) => {
   return (
-    <DragDropContext onDragEnd={handleOnDragEnd}>
-      <Droppable droppableId="tempDrappableId">
-        {(provided) => (
-          <div
-            className="tempDrappableId"
-            {...provided.droppableProps}
-            ref={provided.innerRef}
-          >
-            {renderLayers.map(({ renderLayer, id }, index) => {
-              return (
-                <Draggable key={id} draggableId={`${id}`} index={index}>
-                  {(provided) => (
-                    <SequentialGrid
-                      ref={provided.innerRef}
-                      {...provided.draggableProps}
-                      {...provided.dragHandleProps}
-                    >
-                      <IconWrappingBox>
-                        <StyledDragIndicator />
-                      </IconWrappingBox>
-                      <div>{renderLayer()}</div>
-                    </SequentialGrid>
-                  )}
-                </Draggable>
-              );
-            })}
-          </div>
-        )}
-      </Droppable>
-    </DragDropContext>
+    <div>
+      <DragDropContext onDragEnd={handleOnDragEnd}>
+        <Droppable droppableId="tempDrappableId">
+          {(provided) => (
+            <div
+              className="tempDrappableId"
+              {...provided.droppableProps}
+              ref={provided.innerRef}
+            >
+              {renderLayers.map(({ renderLayer, id }, index) => {
+                return (
+                  <Draggable key={id} draggableId={`${id}`} index={index}>
+                    {(provided) => (
+                      <SequentialGrid
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        {...provided.dragHandleProps}
+                      >
+                        <IconWrappingBox>
+                          <StyledDragIndicator />
+                        </IconWrappingBox>
+                        <div>{renderLayer()}</div>
+                      </SequentialGrid>
+                    )}
+                  </Draggable>
+                );
+              })}
+            </div>
+          )}
+        </Droppable>
+      </DragDropContext>
+    </div>
   );
 };
 
