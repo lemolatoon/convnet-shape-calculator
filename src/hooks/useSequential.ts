@@ -68,6 +68,13 @@ export const useSequentialLogic = (
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const handleOnDragEnd: OnDragEndResponder = (result: any) => {
       const items = Array.from(params);
+      if (
+        result.source == null ||
+        result.source.index == null ||
+        result.destination == null ||
+        result.destination.index == null
+      )
+        return;
       const [reorderedItem] = items.splice(result.source.index, 1);
       items.splice(result.destination.index, 0, reorderedItem);
 
