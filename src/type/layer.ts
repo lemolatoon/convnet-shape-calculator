@@ -14,11 +14,15 @@ export const param = <Name extends string, T extends Value>(
 ) => ({ name, val });
 
 export type ParamBase = object;
+// type Tuple<Type, Length extends number> = ComputeTuple<Type, Length, []>;
+// type ComputeTuple<
+//   Type,
+//   Length extends number,
+//   Tail extends Type[],
+// > = Tail['length'] extends Length
+//   ? Tail
+//   : ComputeTuple<Type, Length, [Type, ...Tail]>;
 export type PrimitiveLayerParams<T extends Value> = Param<T>[];
-
-export type MapParam<T extends PrimitiveLayerParams<Value>> = {
-  [K in keyof T]: { name: T[K]["name"]; val: string };
-};
 
 export type OnClickTypes = (key: number) => ((val: string) => void) | undefined;
 
