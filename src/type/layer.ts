@@ -1,4 +1,4 @@
-import { Conv2dParams } from "@/components/layers/sizeFuncs";
+import { Conv2dParams, MaxPool2dParams } from "@/components/layers/sizeFuncs";
 import { Size, Tensor } from "@/type/size";
 import { RequiredDeep } from "@/type/util";
 
@@ -20,7 +20,7 @@ export type OnClickTypes = (key: number) => ((val: string) => void) | undefined;
 
 export type applyLayer<T extends Size> = (tensor?: Tensor<T>) => JSX.Element;
 
-export type LayerKey = "Sequential" | "Conv2d" | "JustTensor";
+export type LayerKey = "Sequential" | "Conv2d" | "JustTensor" | "MaxPool2d";
 type LayerFactory<K extends LayerKey, T extends ParamBase> = {
   key: K;
   params: T;
@@ -33,9 +33,15 @@ export type SequentialLayer = LayerFactory<"Sequential", SequentialParams>;
 
 type Conv2dLayer = LayerFactory<"Conv2d", RequiredDeep<Conv2dParams>>;
 
+type MaxPool2dLayer = LayerFactory<"MaxPool2d", RequiredDeep<MaxPool2dParams>>;
+
 type JustTensorLayer = LayerFactory<"JustTensor", { name: string }>;
 
-export type Layer = SequentialLayer | Conv2dLayer | JustTensorLayer;
+export type Layer =
+  | SequentialLayer
+  | Conv2dLayer
+  | MaxPool2dLayer
+  | JustTensorLayer;
 
 // pureFunction
 export type Forward = (

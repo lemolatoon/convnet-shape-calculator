@@ -103,3 +103,75 @@ export const conv2d: (params: RequiredDeep<Conv2dParams>) => {
   };
   return { layer };
 };
+
+export type MaxPool2dParams = [
+  {
+    name: "kernel_size";
+    val: number;
+  },
+  {
+    name: "stride";
+    val?: number;
+  },
+  {
+    name: "padding";
+    val?: number;
+  },
+  {
+    name: "dilation";
+    val?: number;
+  },
+  {
+    name: "return_indices";
+    val?: boolean;
+  },
+  {
+    name: "ceil_mode";
+    val?: boolean;
+  }
+];
+export const normalizeMaxPool2dParams = (
+  params: MaxPool2dParams
+): RequiredDeep<MaxPool2dParams> => {
+  const normalized = [...params];
+  normalized[1].val = normalized[1].val ?? normalized[0].val; // stride
+  normalized[2].val = normalized[2].val ?? 0; // padding
+  normalized[3].val = normalized[3].val ?? 1; // dilation
+  normalized[4].val = normalized[4].val ?? false; // dilation
+  normalized[5].val = normalized[5].val ?? false; // ceil_mode
+  return normalized as RequiredDeep<MaxPool2dParams>;
+};
+
+export const maxpool2d =
+  ([
+    { val: kernel_size },
+    { val: stride },
+    { val: padding },
+    { val: dilation },
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    { val: _return_indices },
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    { val: _ceil_mode },
+  ]: RequiredDeep<MaxPool2dParams>) =>
+  (size: Size) => {
+    if (size.length !== 3 && size.length !== 4)
+      throw new SizeError(
+        `Conv2d's input tensor's shape dimention must be 3 or 4. but got ${size.length}`
+      );
+    const { c_in, h_in, w_in } =
+      size[3] !== undefined
+        ? { c_in: size[1], h_in: size[2], w_in: size[3] }
+        : { c_in: size[0], h_in: size[1], w_in: size[2] };
+    const h_out = Math.ceil(
+      (h_in + 2 * padding - dilation * (kernel_size - 1) - 1) / stride + 1
+    );
+    const w_out = Math.ceil(
+      (w_in + 2 * padding - dilation * (kernel_size - 1) - 1) / stride + 1
+    );
+    const features = [c_in, h_out, w_out] as const;
+    if (size[3] !== undefined) {
+      return [size[0], ...features];
+    } else {
+      return [...features];
+    }
+  };
