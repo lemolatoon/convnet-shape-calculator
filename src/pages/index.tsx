@@ -1,17 +1,22 @@
-import { useConv2d } from "@/components/layers/Conv2d";
-import { applyInput, applyOutput } from "@/components/layers/JustTensor";
 import { normalizeConv2dParams } from "@/components/layers/sizeFuncs";
-import { useSequential } from "@/components/Sequential";
 import { renderLayer } from "@/components/ui/Layer";
 import { normalizeSequentialParams } from "@/hooks/useSequential";
 import { Layer, param } from "@/type/layer";
-import { Conv2dSize, Size, Tensor } from "@/type/size";
+import { Size, Tensor } from "@/type/size";
 import { assetFullUrl, assetUrl } from "@/utils/config";
 import Head from "next/head";
 
 export default function Home() {
   const input: Tensor<Size> = {
     shape: [32, 1, 28, 28],
+  };
+  const inputLayer: Layer = {
+    key: "JustTensor",
+    params: { name: "Input" },
+  };
+  const outputLayer: Layer = {
+    key: "JustTensor",
+    params: { name: "Output" },
   };
   const conv1: Layer = {
     key: "Conv2d",
@@ -35,10 +40,11 @@ export default function Home() {
       param("dilation", undefined),
     ]),
   };
-  const Sequential: Layer = {
+  const sequentialLayer: Layer = {
     key: "Sequential",
-    params: normalizeSequentialParams([conv1, conv2]),
+    params: normalizeSequentialParams([inputLayer, conv1, conv2, outputLayer]),
   };
+  const Sequential = renderLayer(sequentialLayer, (val) => console.log(val));
   return (
     <>
       <Head>
@@ -59,7 +65,7 @@ export default function Home() {
       </Head>
       <main>
         <h1>ConvNet Shape Calculator</h1>
-        {renderLayer(conv1, (val) => console.log(val))(input)}
+        <Sequential tensor={input} />
       </main>
     </>
   );

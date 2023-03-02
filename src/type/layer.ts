@@ -43,8 +43,12 @@ export type Forward = (
 ) => Tensor<Size> | undefined;
 // pureFunction
 export type Clone = <L extends Layer>(layer: L) => L;
+
+export type RenderProps = {
+  tensor?: Tensor<Size>;
+};
 // pureFunction
 export type Render = (
   layer: Layer,
   updateLayer: (layer: Layer) => void
-) => (tensor?: Tensor<Size>) => JSX.Element;
+) => (props: RenderProps) => JSX.Element;

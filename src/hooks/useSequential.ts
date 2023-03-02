@@ -1,4 +1,5 @@
-import { Layer, SequentialParams } from "@/type/layer";
+import { renderLayer } from "@/components/ui/Layer";
+import { Layer, RenderProps, SequentialParams } from "@/type/layer";
 import { Size, Tensor } from "@/type/size";
 import { forward } from "@/utils/layer";
 import { OnDragEndResponder } from "@hello-pangea/dnd";
@@ -13,15 +14,26 @@ export const useSequentialLogic = (
 ) => {
   const genSequentialProps = (tensor?: Tensor<Size>) => {
     const { renderLayers, tensors } = params.reduce<{
-      renderLayers: { renderLayer: () => JSX.Element; id: number }[];
+      renderLayers: {
+        renderLayer: () => JSX.Element;
+        id: number;
+      }[];
       tensors: (Tensor<Size> | undefined)[];
     }>(
-      ({ renderLayers, tensors }, { layer, id }) => {
-        const renderLayer = () => undefined as any; // TODO
-        throw new Error("todo");
-        const nextTensor = forward(layer, tensors.slice(-1)[0]);
+      ({ renderLayers, tensors }, { layer, id }, idx) => {
+        const updateLayer = (updatedLayer: Layer) => {
+          let copiedParams: typeof params = JSON.parse(JSON.stringify(params));
+          copiedParams[idx] = { layer: updatedLayer, id };
+          updateParams(copiedParams);
+        };
+        const currentTensor = tensors.slice(-1)[0];
+        const renderCurrrentLayer = () => renderLayer(layer, updateLayer)({tensor: currentTensor});
+        const nextTensor = forward(layer, currentTensor);
         return {
-          renderLayers: [...renderLayers, { renderLayer, id }],
+          renderLayers: [
+            ...renderLayers,
+            { renderLayer: renderCurrrentLayer, id },
+          ],
           tensors: [...tensors, nextTensor],
         };
       },

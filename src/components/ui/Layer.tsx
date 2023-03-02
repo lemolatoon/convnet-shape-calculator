@@ -153,21 +153,21 @@ export const renderLayer: Render = (
 ) => {
   switch (layer.key) {
     case "Conv2d":
-      return function Conv2d(tensor?: Tensor<Size>) {
+      return function Conv2d({ tensor }) {
         const updateParams = (params: RequiredDeep<Conv2dParams>) =>
           updateLayer({ key: "Conv2d", params });
         const applyLayer = useConv2d(layer.params, updateParams);
         return applyLayer(tensor);
       };
     case "Sequential":
-      return function Sequential(tensor?: Tensor<Size>) {
+      return function Sequential({ tensor }) {
         const updateParams = (params: SequentialParams) =>
           updateLayer({ key: "Sequential", params });
         const applyLayer = useSequential(layer.params, updateParams);
         return applyLayer(tensor);
       };
     case "JustTensor":
-      return function JustTensor(tensor?: Tensor<Size>) {
+      return function JustTensor({ tensor }) {
         return makeJustTensorApplyLayer(layer.params.name)(tensor);
       };
     default:
