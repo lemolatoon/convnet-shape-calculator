@@ -180,7 +180,7 @@ const LayerHOCBox = styled.div`
     grid-row-start: 0;
     grid-row-end: 1;
     grid-column-start: 1;
-    grid-column-end: 2;
+    grid-column-end: 3;
   }
 `;
 
