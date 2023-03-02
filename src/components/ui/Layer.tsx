@@ -1,6 +1,6 @@
 import { useConv2d } from "@/components/layers/Conv2d";
 import { makeJustTensorApplyLayer } from "@/components/layers/JustTensor";
-import { Conv2dParams } from "@/components/layers/sizeFuncs";
+import { Conv2dParams, MaxPool2dParams } from "@/components/layers/sizeFuncs";
 import { useSequential } from "@/components/Sequential";
 import {
   Layer,
@@ -18,6 +18,7 @@ import styled from "styled-components";
 import { BiDuplicate } from "react-icons/bi";
 import { TiDelete } from "react-icons/ti";
 import { clone } from "@/utils/layer";
+import { useMaxPool2d } from "@/components/layers/MaxPool2d";
 
 export type LayerProps<T extends string | number | undefined> = {
   name: string;
@@ -229,6 +230,13 @@ export const renderLayer: Render = (
       case "JustTensor":
         return function JustTensor({ tensor }: RenderProps) {
           return makeJustTensorApplyLayer(layer.params.name)(tensor);
+        };
+      case "MaxPool2d":
+        return function MaxPool2d({ tensor }: RenderProps) {
+          const updateParams = (params: RequiredDeep<MaxPool2dParams>) =>
+            updateLayer({ key: "MaxPool2d", params });
+          const applyLayer = useMaxPool2d(layer.params, updateParams);
+          return applyLayer(tensor);
         };
       default:
         exhaustiveChack(layer);

@@ -1,4 +1,9 @@
-import { conv2d, normalizeConv2dParams } from "@/components/layers/sizeFuncs";
+import {
+  conv2d,
+  maxpool2d,
+  normalizeConv2dParams,
+  normalizeMaxPool2dParams,
+} from "@/components/layers/sizeFuncs";
 import { Clone, Forward, Layer, PrimitiveLayerParams } from "@/type/layer";
 import { Size, Tensor } from "@/type/size";
 import { exhaustiveChack } from "@/type/util";
@@ -26,9 +31,7 @@ export const forward: Forward = (layer: Layer, tensor?: Tensor<Size>) => {
     switch (layer.key) {
       case "Conv2d":
         return {
-          shape: conv2d(normalizeConv2dParams(layer.params)).layer(
-            tensor.shape
-          ),
+          shape: conv2d(normalizeConv2dParams(layer.params))(tensor.shape),
         };
       case "Sequential":
         return layer.params.reduce(
@@ -37,6 +40,12 @@ export const forward: Forward = (layer: Layer, tensor?: Tensor<Size>) => {
         );
       case "JustTensor":
         return tensor;
+      case "MaxPool2d":
+        return {
+          shape: maxpool2d(normalizeMaxPool2dParams(layer.params))(
+            tensor.shape
+          ),
+        };
       default:
         exhaustiveChack(layer);
         throw new Error("unreacheable");

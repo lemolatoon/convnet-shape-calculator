@@ -1,8 +1,13 @@
-import { normalizeConv2dParams } from "@/components/layers/sizeFuncs";
+import {
+  normalizeConv2dParams,
+  normalizeMaxPool2dParams,
+} from "@/components/layers/sizeFuncs";
 import { Sequential } from "@/components/Sequential";
+import { normalizeSequentialParams } from "@/hooks/useSequential";
 import { Layer, param } from "@/type/layer";
 import { Size, Tensor } from "@/type/size";
 import { assetFullUrl, assetUrl } from "@/utils/config";
+import { clone } from "@/utils/layer";
 import Head from "next/head";
 
 export default function Home() {
@@ -32,6 +37,15 @@ export default function Home() {
       param("dilation", undefined),
     ]),
   };
+  const pool1: Layer = {
+    key: "MaxPool2d",
+    params: normalizeMaxPool2dParams([
+      param("kernel_size", 3),
+      param("stride", undefined),
+      param("padding", undefined),
+      param("dilation", undefined),
+    ]),
+  };
   const conv2: Layer = {
     key: "Conv2d",
     params: normalizeConv2dParams([
@@ -42,6 +56,10 @@ export default function Home() {
       param("padding", undefined),
       param("dilation", undefined),
     ]),
+  };
+  const sequentialLayer: Layer = {
+    key: "Sequential",
+    params: normalizeSequentialParams([conv1, clone(pool1), conv2, pool1]),
   };
   return (
     <>
@@ -64,7 +82,12 @@ export default function Home() {
       <main>
         <h1>ConvNet Shape Calculator</h1>
         <Sequential
-          initLayers={[inputLayer, conv1, conv2, outputLayer]}
+          initLayers={[
+            inputLayer,
+            clone(sequentialLayer),
+            sequentialLayer,
+            outputLayer,
+          ]}
           inputTensor={input}
         />
       </main>
