@@ -5,6 +5,7 @@ import { Layer, param } from "@/type/layer";
 import { Size, Tensor } from "@/type/size";
 import { assetFullUrl, assetUrl } from "@/utils/config";
 import Head from "next/head";
+import { useState } from "react";
 
 export default function Home() {
   const input: Tensor<Size> = {
@@ -40,11 +41,15 @@ export default function Home() {
       param("dilation", undefined),
     ]),
   };
-  const sequentialLayer: Layer = {
+  const initSequentialLayer: Layer = {
     key: "Sequential",
     params: normalizeSequentialParams([inputLayer, conv1, conv2, outputLayer]),
   };
-  const Sequential = renderLayer(sequentialLayer, (val) => console.log(val));
+  const [sequentialLayer, setSequentialLayer] =
+    useState<Layer>(initSequentialLayer);
+  const Sequential = renderLayer(sequentialLayer, (layer) =>
+    setSequentialLayer(layer)
+  );
   return (
     <>
       <Head>

@@ -9,7 +9,7 @@ import {
   Render,
   SequentialParams,
 } from "@/type/layer";
-import { displaySize, Size, Tensor } from "@/type/size";
+import { displaySize, Size } from "@/type/size";
 import { exhaustiveChack, RequiredDeep } from "@/type/util";
 import { ChangeEvent } from "react";
 import styled from "styled-components";

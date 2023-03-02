@@ -1,7 +1,6 @@
 import { Conv2dParams } from "@/components/layers/sizeFuncs";
 import { Size, Tensor } from "@/type/size";
 import { RequiredDeep } from "@/type/util";
-import { K } from "vitest/dist/types-7cd96283";
 
 export type Value = string | number | undefined;
 type Param<T extends Value> = {
@@ -28,7 +27,7 @@ type LayerFactory<K extends LayerKey, T extends ParamBase> = {
 };
 
 export type SequentialParams = { layer: Layer; id: number }[];
-type SequentialLayer = LayerFactory<"Sequential", SequentialParams>;
+export type SequentialLayer = LayerFactory<"Sequential", SequentialParams>;
 
 type Conv2dLayer = LayerFactory<"Conv2d", RequiredDeep<Conv2dParams>>;
 
