@@ -46,6 +46,15 @@ export default function Home() {
       param("dilation", undefined),
     ]),
   };
+  const pool2: Layer = {
+    key: "MaxPool2d",
+    params: normalizeMaxPool2dParams([
+      param("kernel_size", 3),
+      param("stride", undefined),
+      param("padding", undefined),
+      param("dilation", undefined),
+    ]),
+  };
   const conv2: Layer = {
     key: "Conv2d",
     params: normalizeConv2dParams([
@@ -59,7 +68,7 @@ export default function Home() {
   };
   const sequentialLayer: Layer = {
     key: "Sequential",
-    params: normalizeSequentialParams([conv1, clone(pool1), conv2, pool1]),
+    params: normalizeSequentialParams([conv1, pool1, conv2, pool2]),
   };
   return (
     <>

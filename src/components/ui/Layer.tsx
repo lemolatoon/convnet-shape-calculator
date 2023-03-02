@@ -32,7 +32,7 @@ const LayerParamBox = styled.div`
   display: grid;
   @media (max-width: 767px) {
     font-size: 0.75em;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(1, 1fr);
   }
   @media (min-width: 767px) and (max-width: 1200px) {
     font-size: 32px;
@@ -49,6 +49,15 @@ const LayerParam = styled.div`
 `;
 const ErrorMessage = styled.div`
   align-self: flex-end;
+  @media (max-width: 767px) {
+    font-size: 0.5em;
+  }
+  @media (min-width: 767px) and (max-width: 1200px) {
+    font-size: 32px;
+  }
+  @media (min-width: 1200px) {
+    font-size: 1em;
+  }
   color: red;
 `;
 
@@ -71,10 +80,13 @@ const Grid = styled.div`
 
 const Name = styled.div`
   @media (max-width: 767px) {
-    font-size: 2em;
+    font-size: 16px;
   }
-  @media (min-width: 767px) {
-    font-size: 50px;
+  @media (min-width: 767px) and (max-width: 1200px) {
+    font-size: 32px;
+  }
+  @media (min-width: 1200px) {
+    font-size: 2em;
   }
   font-weight: bold;
 `;
@@ -155,12 +167,29 @@ export const LayerBase = <T extends string | number>({
 
 const StyledDuplicateButton = styled(BiDuplicate)`
   cursor: pointer;
-  font-size: 2em;
+  @media (max-width: 767px) {
+    font-size: 16px;
+  }
+  @media (min-width: 767px) and (max-width: 1200px) {
+    font-size: 32px;
+  }
+  @media (min-width: 1200px) {
+    font-size: 2em;
+  }
 `;
 
 const StyledDeleteButton = styled(TiDelete)`
   cursor: pointer;
-  font-size: 2em;
+  cursor: pointer;
+  @media (max-width: 767px) {
+    font-size: 16px;
+  }
+  @media (min-width: 767px) and (max-width: 1200px) {
+    font-size: 32px;
+  }
+  @media (min-width: 1200px) {
+    font-size: 2em;
+  }
 `;
 const ButtonBox = styled.div`
   display: flex;

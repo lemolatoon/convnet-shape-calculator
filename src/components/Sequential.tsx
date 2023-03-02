@@ -17,9 +17,8 @@ import { renderLayer } from "@/components/ui/Layer";
 
 const SequentialGrid = styled.div`
   display: grid;
-  grid-template-columns: 2rem 1fr;
+  grid-template-columns: auto 1fr;
 `;
-
 const IconWrappingBox = styled.div`
   cursor: pointer;
   display: flex;
@@ -27,13 +26,23 @@ const IconWrappingBox = styled.div`
 `;
 const StyledDragIndicator = styled(MdDragIndicator)`
   justify-content: center;
-  font-size: 2rem;
+  cursor: pointer;
+  @media (max-width: 767px) {
+    font-size: 16px;
+  }
+  @media (min-width: 767px) and (max-width: 1200px) {
+    font-size: 32px;
+  }
+  @media (min-width: 1200px) {
+    font-size: 2em;
+  }
 `;
 
 const SequentialWrapper = styled.div`
   padding: 10px;
   border-radius: 10px;
   border: solid;
+  margin: 0;
 `;
 
 type SequentialLayoutProps = {
