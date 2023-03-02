@@ -16,6 +16,7 @@ import { exhaustiveChack, RequiredDeep } from "@/type/util";
 import { ChangeEvent } from "react";
 import styled from "styled-components";
 import { BiDuplicate } from "react-icons/bi";
+import { clone } from "@/utils/layer";
 
 export type LayerProps<T extends string | number | undefined> = {
   name: string;
@@ -173,11 +174,15 @@ const LayerHOCBox = styled.div`
   }
 `;
 
-const AddCommonsAlongAllLayers = (PureLayer: LayerComponent): LayerComponent =>
+const AddCommonsAlongAllLayers = (
+  PureLayer: LayerComponent,
+  onDuplicate?: () => void
+): LayerComponent =>
   function AppliedLayer({ tensor }: RenderProps) {
+    if (!onDuplicate) return <PureLayer tensor={tensor} />;
     return (
       <LayerHOCBox>
-        <StyledDuplicateButton />
+        <StyledDuplicateButton onClick={onDuplicate} />
         <LayerWrapper>
           <PureLayer tensor={tensor} />
         </LayerWrapper>
@@ -187,7 +192,8 @@ const AddCommonsAlongAllLayers = (PureLayer: LayerComponent): LayerComponent =>
 
 export const renderLayer: Render = (
   layer: Layer,
-  updateLayer: (layer: Layer) => void
+  updateLayer: (layer: Layer) => void,
+  addLayer?: (layer: Layer) => void
 ) => {
   const PureLayer = (() => {
     switch (layer.key) {
@@ -214,5 +220,6 @@ export const renderLayer: Render = (
         throw new Error("unreacheable");
     }
   })();
-  return AddCommonsAlongAllLayers(PureLayer);
+  const onDuplicate = addLayer ? () => addLayer(clone(layer)) : undefined;
+  return AddCommonsAlongAllLayers(PureLayer, onDuplicate);
 };

@@ -50,5 +50,6 @@ export type LayerComponent = (props: RenderProps) => JSX.Element;
 // pureFunction
 export type Render = (
   layer: Layer,
-  updateLayer: (layer: Layer) => void
+  updateLayer: (layer: Layer) => void,
+  addLayer?: (layer: Layer) => void
 ) => LayerComponent;

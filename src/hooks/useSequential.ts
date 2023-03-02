@@ -28,9 +28,19 @@ export const useSequentialLogic = (
           copiedParams[idx] = { layer: updatedLayer, id };
           updateParams(copiedParams);
         };
+        const addLayer = (newLayer: Layer) => {
+          const copiedParams: typeof params = JSON.parse(
+            JSON.stringify(params)
+          );
+          copiedParams.splice(idx + 1, 0, {
+            layer: newLayer,
+            id: params.length,
+          });
+          updateParams(copiedParams);
+        };
         const currentTensor = tensors.slice(-1)[0];
         const renderCurrrentLayer = () =>
-          renderLayer(layer, updateLayer)({ tensor: currentTensor });
+          renderLayer(layer, updateLayer, addLayer)({ tensor: currentTensor });
         const nextTensor = forward(layer, currentTensor);
         return {
           renderLayers: [
