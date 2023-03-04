@@ -13,7 +13,7 @@ import {
 } from "@/type/layer";
 import { displaySize, Size } from "@/type/size";
 import { exhaustiveChack, RequiredDeep } from "@/type/util";
-import { ChangeEvent, useState } from "react";
+import { useState } from "react";
 import styled from "styled-components";
 import { BiDuplicate } from "react-icons/bi";
 import { TiDelete } from "react-icons/ti";
@@ -22,6 +22,7 @@ import { clone } from "@/utils/layer";
 import { useMaxPool2d } from "@/components/layers/MaxPool2d";
 import { CenteredModal } from "@/components/ui/Modal";
 import { CreateLayer } from "@/components/CreateLayer";
+import { useDebounce } from "@/hooks/useDebounce";
 
 export type LayerProps<T extends string | number | undefined> = {
   name: string;
@@ -119,6 +120,42 @@ const TransparentInput = styled.input<TransparentInputProps>`
   font-size: inherit;
 `;
 
+type DebouncedTransparentInputProps = {
+  isReadonly: boolean;
+  onChange: (value: string) => void;
+  value: string;
+  children?: React.ReactNode;
+  intervalMilliSec?: number;
+};
+const DebouncedTransparentInput = ({
+  isReadonly,
+  onChange,
+  value,
+  children,
+  intervalMilliSec,
+}: DebouncedTransparentInputProps) => {
+  const [text, setText] = useState(value);
+  const [debouncedOnChange] = useDebounce(
+    (value: string) => onChange(value),
+    intervalMilliSec ?? 1000
+  );
+
+  return (
+    <TransparentInput
+      isReadonly={isReadonly}
+      readOnly={isReadonly}
+      onChange={(e) => {
+        debouncedOnChange(e.target.value);
+        setText(e.target.value);
+      }}
+      value={text}
+      type="number"
+    >
+      {children}
+    </TransparentInput>
+  );
+};
+
 export const LayerBase = <T extends string | number>({
   name,
   params,
@@ -145,18 +182,16 @@ export const LayerBase = <T extends string | number>({
           {params.map(({ name, val }, key) => {
             const onClick = onClicks(key);
             const isReadonly = onClick === undefined;
-            const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-              onClick ? onClick(e.target.value) : undefined;
+            const handleChange = (value: string) => {
+              onClick ? onClick(value) : undefined;
             };
             return (
               <LayerParam key={key}>
                 {name}:
-                <TransparentInput
+                <DebouncedTransparentInput
                   onChange={handleChange}
                   isReadonly={isReadonly}
-                  readOnly={isReadonly}
-                  value={val}
-                  type="number"
+                  value={`${val}`}
                 />
               </LayerParam>
             );
