@@ -6,7 +6,7 @@ import {
   Layer,
   LayerComponent,
   OnClickTypes,
-  PrimitiveLayerParams,
+  ParamsBase,
   Render,
   RenderProps,
   SequentialParams,
@@ -24,13 +24,14 @@ import { CenteredModal } from "@/components/ui/Modal";
 import { CreateLayer } from "@/components/CreateLayer";
 import { useDebounce } from "@/hooks/useDebounce";
 
-export type LayerProps<T extends string | number | undefined> = {
+export type LayerProps<P extends ParamsBase> = {
   name: string;
-  params: PrimitiveLayerParams<T>;
+  params: P;
   sizeBeforeApply?: Size;
   sizeAfterApply?: Size;
   errorMsg?: string;
   onClicks: OnClickTypes;
+  edittableSize?: boolean;
 };
 const LayerParamBox = styled.div`
   display: grid;
@@ -108,6 +109,34 @@ const SizeExpr = styled.div`
   justify-content: right;
 `;
 
+type EditableSizeExprProps = {
+  sizeBeforeApply?: Size;
+  sizeAfterApply?: Size;
+  editable?: boolean;
+};
+const EditableSizeExpr = ({
+  sizeBeforeApply,
+  sizeAfterApply,
+  editable,
+}: EditableSizeExprProps) => {
+  const sizeExpression = (() => {
+    if (sizeBeforeApply && sizeAfterApply) {
+      return `${displaySize(sizeBeforeApply)} → ${displaySize(sizeAfterApply)}`;
+    } else if (sizeAfterApply) {
+      return displaySize(sizeAfterApply);
+    } else if (sizeBeforeApply) {
+      return `${displaySize(sizeBeforeApply)} →`;
+    }
+  })();
+  return <SizeExpr>{sizeExpression}</SizeExpr>;
+};
+
+type DisplaySizeProps = {
+  editable: boolean;
+};
+// const DisplaySize = ({edittable}: DisplaySizeProps) => {
+// }
+
 type TransparentInputProps = {
   isReadonly: boolean;
 };
@@ -156,31 +185,27 @@ const DebouncedTransparentInput = ({
   );
 };
 
-export const LayerBase = <T extends string | number>({
+export const LayerBase = <P extends ParamsBase>({
   name,
   params,
   sizeBeforeApply,
   sizeAfterApply,
   onClicks,
   errorMsg,
-}: LayerProps<T>) => {
-  const sizeExpression = (() => {
-    if (sizeBeforeApply && sizeAfterApply) {
-      return `${displaySize(sizeBeforeApply)} → ${displaySize(sizeAfterApply)}`;
-    } else if (sizeAfterApply) {
-      return displaySize(sizeAfterApply);
-    } else if (sizeBeforeApply) {
-      return `${displaySize(sizeBeforeApply)} →`;
-    }
-  })();
+  edittableSize,
+}: LayerProps<P>) => {
   return (
     <GridWrapper>
       <Grid>
         <Name>{name}</Name>
-        <SizeExpr>{sizeExpression}</SizeExpr>
+        <EditableSizeExpr
+          sizeBeforeApply={sizeBeforeApply}
+          sizeAfterApply={sizeAfterApply}
+          editable={edittableSize}
+        />
         <LayerParamBox>
-          {params.map(({ name, val }, key) => {
-            const onClick = onClicks(key);
+          {Object.entries(params).map(([name, val], key) => {
+            const onClick = onClicks[name];
             const isReadonly = onClick === undefined;
             const handleChange = (value: string) => {
               onClick ? onClick(value) : undefined;
@@ -321,7 +346,7 @@ export const renderLayer: Render = (
         };
       case "JustTensor":
         return function JustTensor({ tensor }: RenderProps) {
-          return makeJustTensorApplyLayer(layer.params.name)(tensor);
+          return makeJustTensorApplyLayer(layer.params.name, true)(tensor);
         };
       case "MaxPool2d":
         return function MaxPool2d({ tensor }: RenderProps) {

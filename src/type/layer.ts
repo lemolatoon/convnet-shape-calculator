@@ -2,29 +2,7 @@ import { Conv2dParams, MaxPool2dParams } from "@/components/layers/sizeFuncs";
 import { Size, Tensor } from "@/type/size";
 import { RequiredDeep } from "@/type/util";
 
-export type Value = string | number | boolean | undefined;
-type Param<T extends Value> = {
-  name: string;
-  val: T;
-};
-
-export const param = <Name extends string, T extends Value>(
-  name: Name,
-  val: T
-) => ({ name, val });
-
-export type ParamBase = object;
-// type Tuple<Type, Length extends number> = ComputeTuple<Type, Length, []>;
-// type ComputeTuple<
-//   Type,
-//   Length extends number,
-//   Tail extends Type[],
-// > = Tail['length'] extends Length
-//   ? Tail
-//   : ComputeTuple<Type, Length, [Type, ...Tail]>;
-export type PrimitiveLayerParams<T extends Value> = Param<T>[];
-
-export type OnClickTypes = (key: number) => ((val: string) => void) | undefined;
+export type OnClickTypes = Record<string, ((val: string) => void) | undefined>;
 
 export type applyLayer<T extends Size> = (tensor?: Tensor<T>) => JSX.Element;
 
@@ -35,17 +13,22 @@ export const layerKeys = [
   "MaxPool2d",
 ] as const;
 export type LayerKey = (typeof layerKeys)[number];
-type LayerFactory<K extends LayerKey, T extends ParamBase> = {
+
+type OneLayer = { layer: Layer; id: number };
+export type Value = OneLayer[] | string | number | boolean;
+export type ParamsBase = Record<string, Value>;
+type LayerFactory<K extends LayerKey, P extends ParamsBase> = {
   key: K;
-  params: T;
+  params: P;
   noDelete?: boolean;
   noDuplicate?: boolean;
 };
-
-export type SequentialParams = { layer: Layer; id: number }[];
+export type SequentialParams = {
+  layers: OneLayer[];
+};
 export type SequentialLayer = LayerFactory<"Sequential", SequentialParams>;
 
-type Conv2dLayer = LayerFactory<"Conv2d", RequiredDeep<Conv2dParams>>;
+type Conv2dLayer = LayerFactory<"Conv2d", Conv2dParams>;
 
 type MaxPool2dLayer = LayerFactory<"MaxPool2d", RequiredDeep<MaxPool2dParams>>;
 

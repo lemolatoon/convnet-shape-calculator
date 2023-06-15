@@ -1,28 +1,31 @@
 import { useParamState } from "@/hooks/useObjectState";
-import { PrimitiveLayerParams, applyLayer, OnClickTypes } from "@/type/layer";
+import { applyLayer, OnClickTypes, ParamsBase } from "@/type/layer";
 import { LayerFunction, Size, Tensor } from "@/type/size";
 import { LayerBase } from "@/components/ui/Layer";
 
-const validate = (key: string, val: number) => {
-  if (val < 0) throw new Error(`param (${key}) is negative: ${val}`);
+export type MapperType<T extends ParamsBase> = {
+  [K in keyof T]: (val: string) => T[K];
 };
-
-export const layerHookFactory = <T extends PrimitiveLayerParams<number | "">>(
+export const layerHookFactory = <T extends ParamsBase>(
   name: string,
   f: (params: T) => LayerFunction<Size>,
-  paramsLength: number
+  paramMappers: MapperType<T>
 ) => {
   const useLayer = (
     __params: T,
     updateParams: (params: T) => void
   ): applyLayer<Size> => {
-    const { obj: params, dispatch } = useParamState<
-      number | "",
-      number | "",
-      T
-    >(__params, updateParams, (val) => val as T);
-    const onClicks: OnClickTypes = (key) => (val) =>
-      dispatch(key, val === "" ? "" : Number(val));
+    const { params, dispatch } = useParamState(__params, updateParams);
+    const onClicks: OnClickTypes = Object.fromEntries(
+      Object.keys(params).map((key) => {
+        return [
+          key,
+          key in params
+            ? (val) => dispatch(key, paramMappers[key](val))
+            : undefined,
+        ] as const;
+      })
+    );
 
     const applyLayer = (tensor: Tensor<Size> | undefined) => {
       const { sizeAfterApply, errorMsg } = (() => {
@@ -30,12 +33,11 @@ export const layerHookFactory = <T extends PrimitiveLayerParams<number | "">>(
           return { sizeAfterApply: undefined, errorMsg: undefined };
         }
         try {
-          if (params.length < paramsLength) throw new Error("Illegal params");
-          params.forEach(
-            ({ name, val }) => val !== "" && validate(name, Number(val))
-          );
-          const conv2dF = f(params as T);
-          return { sizeAfterApply: conv2dF(tensor.shape), errorMsg: undefined };
+          const layerFunction = f(params);
+          return {
+            sizeAfterApply: layerFunction(tensor.shape),
+            errorMsg: undefined,
+          };
         } catch (e: unknown) {
           let msg = "Unknown Error Occured";
           if (e instanceof Error) {
