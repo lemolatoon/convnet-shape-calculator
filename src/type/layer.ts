@@ -3,26 +3,19 @@ import { Size, Tensor } from "@/type/size";
 import { RequiredDeep } from "@/type/util";
 
 export type Value = string | number | boolean | undefined;
-type Param<T extends Value> = {
-  name: string;
+type Param<Name extends string, T extends Value> = {
+  name: Name;
   val: T;
 };
+
+export type Params<Ns extends string[], Vs extends Value[]> = {
+  [Index in keyof Vs & keyof Ns & number]: Param<Ns[Index], Vs[Index]>;
+} & { length: Vs["length"] };
 
 export const param = <Name extends string, T extends Value>(
   name: Name,
   val: T
 ) => ({ name, val });
-
-export type ParamBase = object;
-// type Tuple<Type, Length extends number> = ComputeTuple<Type, Length, []>;
-// type ComputeTuple<
-//   Type,
-//   Length extends number,
-//   Tail extends Type[],
-// > = Tail['length'] extends Length
-//   ? Tail
-//   : ComputeTuple<Type, Length, [Type, ...Tail]>;
-export type PrimitiveLayerParams<T extends Value> = Param<T>[];
 
 export type OnClickTypes = (key: number) => ((val: string) => void) | undefined;
 
@@ -35,7 +28,7 @@ export const layerKeys = [
   "MaxPool2d",
 ] as const;
 export type LayerKey = (typeof layerKeys)[number];
-type LayerFactory<K extends LayerKey, T extends ParamBase> = {
+type LayerFactory<K extends LayerKey, T extends Param<string, Value>[]> = {
   key: K;
   params: T;
   noDelete?: boolean;

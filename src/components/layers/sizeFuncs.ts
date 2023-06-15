@@ -1,4 +1,4 @@
-import { PrimitiveLayerParams } from "@/type/layer";
+import { Params } from "@/type/layer";
 import { LayerFunction, Size, SizeError } from "@/type/size";
 import { exhaustiveChack, RequiredDeep } from "@/type/util";
 
