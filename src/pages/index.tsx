@@ -1,13 +1,7 @@
-import {
-  normalizeConv2dParams,
-  normalizeMaxPool2dParams,
-} from "@/components/layers/sizeFuncs";
 import { Sequential } from "@/components/Sequential";
-import { normalizeSequentialParams } from "@/hooks/useSequential";
-import { Layer, param } from "@/type/layer";
+import { Layer } from "@/type/layer";
 import { Size, Tensor } from "@/type/size";
 import { assetFullUrl, assetUrl } from "@/utils/config";
-import { clone } from "@/utils/layer";
 import Head from "next/head";
 
 export default function Home() {
@@ -28,47 +22,49 @@ export default function Home() {
   };
   const conv1: Layer = {
     key: "Conv2d",
-    params: normalizeConv2dParams([
-      param("in_channels", 1),
-      param("out_channels", 3),
-      param("kernel_size", 5),
-      param("stride", undefined),
-      param("padding", undefined),
-      param("dilation", undefined),
-    ]),
+    params: {
+      "in_channels": 1,
+      "out_channels": 3,
+      "kernel_size": 5,
+      "stride": 1,
+      "padding": 0,
+      "dilation": 1,
+    }
   };
   const pool1: Layer = {
     key: "MaxPool2d",
-    params: normalizeMaxPool2dParams([
-      param("kernel_size", 3),
-      param("stride", undefined),
-      param("padding", undefined),
-      param("dilation", undefined),
-    ]),
+    params: {
+      "kernel_size": 3,
+      "stride": 3,
+      "padding": 0,
+      "dilation": 1,
+    }
   };
   const pool2: Layer = {
     key: "MaxPool2d",
-    params: normalizeMaxPool2dParams([
-      param("kernel_size", 3),
-      param("stride", undefined),
-      param("padding", undefined),
-      param("dilation", undefined),
-    ]),
+    params: {
+      "kernel_size": 3,
+      "stride": 3,
+      "padding": 0,
+      "dilation": 1,
+    }
   };
   const conv2: Layer = {
     key: "Conv2d",
-    params: normalizeConv2dParams([
-      param("in_channels", 3),
-      param("out_channels", 6),
-      param("kernel_size", 3),
-      param("stride", undefined),
-      param("padding", undefined),
-      param("dilation", undefined),
-    ]),
+    params: {
+      "in_channels": 3,
+      "out_channels": 6,
+      "kernel_size": 3,
+      "stride": 1,
+      "padding": 0,
+      "dilation": 1,
+    }
   };
   const sequentialLayer: Layer = {
     key: "Sequential",
-    params: normalizeSequentialParams([conv1, pool1, conv2, pool2]),
+    params: {
+      layers: [conv1, pool1, conv2, pool2].map((layer, id) => {return {layer, id};}),
+    },
   };
   return (
     <>
@@ -93,7 +89,6 @@ export default function Home() {
         <Sequential
           initLayers={[
             inputLayer,
-            clone(sequentialLayer),
             sequentialLayer,
             outputLayer,
           ]}

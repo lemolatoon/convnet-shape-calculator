@@ -1,4 +1,9 @@
-import { applyLayer, Layer, SequentialParams } from "@/type/layer";
+import {
+  applyLayer,
+  Layer,
+  SequentialLayer,
+  SequentialParams,
+} from "@/type/layer";
 import { Size, Tensor } from "@/type/size";
 import { MdDragIndicator } from "react-icons/md";
 import styled from "styled-components";
@@ -8,10 +13,7 @@ import {
   Droppable,
   OnDragEndResponder,
 } from "@hello-pangea/dnd";
-import {
-  normalizeSequentialParams,
-  useSequentialLogic,
-} from "@/hooks/useSequential";
+import { useSequentialLogic } from "@/hooks/useSequential";
 import { useId, useState } from "react";
 import { renderLayer } from "@/components/ui/Layer";
 
@@ -113,9 +115,13 @@ type SequentialProps = {
   inputTensor?: Tensor<Size>;
 };
 export const Sequential = ({ initLayers, inputTensor }: SequentialProps) => {
-  const initSequentialLayer: Layer = {
+  const initSequentialLayer: SequentialLayer = {
     key: "Sequential",
-    params: normalizeSequentialParams(initLayers),
+    params: {
+      layers: initLayers.map((layer, id) => {
+        return { layer, id };
+      }),
+    },
   };
   const [sequentialLayer, setSequentialLayer] =
     useState<Layer>(initSequentialLayer);
