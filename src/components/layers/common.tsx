@@ -3,11 +3,13 @@ import { applyLayer, OnClickTypes, ParamsBase } from "@/type/layer";
 import { LayerFunction, Size, Tensor } from "@/type/size";
 import { LayerBase } from "@/components/ui/Layer";
 
-export type MapperType<T extends ParamsBase> = { [K in keyof T]: (val: string) => T[K] };
+export type MapperType<T extends ParamsBase> = {
+  [K in keyof T]: (val: string) => T[K];
+};
 export const layerHookFactory = <T extends ParamsBase>(
   name: string,
   f: (params: T) => LayerFunction<Size>,
-  paramMappers: MapperType<T>, 
+  paramMappers: MapperType<T>
 ) => {
   const useLayer = (
     __params: T,
@@ -15,11 +17,14 @@ export const layerHookFactory = <T extends ParamsBase>(
   ): applyLayer<Size> => {
     const { params, dispatch } = useParamState(__params, updateParams);
     const onClicks: OnClickTypes = Object.fromEntries(
-      Object
-        .keys(params)
-        .map((key) => 
-          {return [key, key in params ? (val) => dispatch(key, paramMappers[key](val)) : undefined] as const;}
-        )
+      Object.keys(params).map((key) => {
+        return [
+          key,
+          key in params
+            ? (val) => dispatch(key, paramMappers[key](val))
+            : undefined,
+        ] as const;
+      })
     );
 
     const applyLayer = (tensor: Tensor<Size> | undefined) => {

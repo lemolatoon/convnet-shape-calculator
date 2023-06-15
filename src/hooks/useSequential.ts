@@ -16,14 +16,12 @@ export const useSequentialLogic = (
     })) {
       const updateLayer = (updatedLayer: Layer) => {
         const copiedParams: typeof params = JSON.parse(JSON.stringify(params));
-        copiedParams.layers[idx] = {layer: updatedLayer, id};
+        copiedParams.layers[idx] = { layer: updatedLayer, id };
         updateParams(copiedParams);
       };
       const addLayer = (newLayer: Layer) => {
         const copiedParams: typeof params = JSON.parse(JSON.stringify(params));
-        const idMax = Math.max(
-          ...copiedParams.layers.map(({ id }) => id)
-        );
+        const idMax = Math.max(...copiedParams.layers.map(({ id }) => id));
         copiedParams.layers.splice(idx + 1, 0, {
           layer: newLayer,
           id: idMax + 2,
@@ -65,7 +63,6 @@ export const useSequentialLogic = (
         return;
       const [reorderedItem] = items.splice(result.source.index, 1);
       items.splice(result.destination.index, 0, reorderedItem);
-      
 
       updateParams({ layers: items });
     };

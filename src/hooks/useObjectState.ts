@@ -1,12 +1,10 @@
 import { ParamsBase } from "@/type/layer";
 import { useState } from "react";
 
-export const useParamState = <
-  P extends ParamsBase 
->(
+export const useParamState = <P extends ParamsBase>(
   init: P,
   updateParams: (params: P) => void,
-  normalizeParams?: (params: P) => P,
+  normalizeParams?: (params: P) => P
 ) => {
   const [params, setParams] = useState(init);
   const dispatch = <K extends keyof P>(key: K, val: P[K]) => {

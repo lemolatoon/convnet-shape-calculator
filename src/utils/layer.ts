@@ -1,13 +1,5 @@
-import {
-  conv2d,
-  maxpool2d,
-} from "@/components/layers/sizeFuncs";
-import {
-  Clone,
-  Forward,
-  Layer,
-  LayerKey,
-} from "@/type/layer";
+import { conv2d, maxpool2d } from "@/components/layers/sizeFuncs";
+import { Clone, Forward, Layer, LayerKey } from "@/type/layer";
 import { Size, Tensor } from "@/type/size";
 import { exhaustiveChack } from "@/type/util";
 
@@ -45,9 +37,7 @@ export const forward: Forward = (layer: Layer, tensor?: Tensor<Size>) => {
         return tensor;
       case "MaxPool2d":
         return {
-          shape: maxpool2d(layer.params)(
-            tensor.shape
-          ),
+          shape: maxpool2d(layer.params)(tensor.shape),
         };
       default:
         exhaustiveChack(layer);
@@ -67,23 +57,23 @@ export const defaultLayer = <K extends LayerKey>(key: K): Layer => {
       return {
         key,
         params: {
-          "in_channels": 1,
-          "out_channels": 3,
-          "kernel_size": 3,
-          "stride": 1,
-          "padding": 0,
-          "dilation": 1,
-        }
+          in_channels: 1,
+          out_channels: 3,
+          kernel_size: 3,
+          stride: 1,
+          padding: 0,
+          dilation: 1,
+        },
       };
     case "MaxPool2d":
       return {
         key,
         params: {
-          "kernel_size": 3,
-          "stride": 3,
-          "padding": 0,
-          "dilation": 1
-        }
+          kernel_size: 3,
+          stride: 3,
+          padding: 0,
+          dilation: 1,
+        },
       };
     case "JustTensor":
       return { key, params: { name: "Tensor's name" } };
@@ -91,7 +81,9 @@ export const defaultLayer = <K extends LayerKey>(key: K): Layer => {
       return {
         key,
         params: {
-          layers: [defaultLayer("Conv2d")].map((layer, id) => {return {layer, id};})
+          layers: [defaultLayer("Conv2d")].map((layer, id) => {
+            return { layer, id };
+          }),
         },
       };
     default:
