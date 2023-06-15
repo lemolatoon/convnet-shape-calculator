@@ -3,23 +3,6 @@ import { Clone, Forward, Layer, LayerKey } from "@/type/layer";
 import { Size, Tensor } from "@/type/size";
 import { exhaustiveChack } from "@/type/util";
 
-// export const paramsHasNoNull = <
-//   T extends string | number,
-//   U extends PrimitiveLayerParams<T>
-// >(
-//   params: PrimitiveLayerParams<T | "">,
-//   optionalValidate?: (key: string, val: T) => void
-// ): params is U => {
-//   params.forEach(({ name, val }) => {
-//     if (typeof val === "string" && val === "") {
-//       throw new Error(`param (${name}) is null.`);
-//     } else if (optionalValidate) {
-//       optionalValidate(name, val);
-//     }
-//   });
-//   return true;
-// };
-
 export const forward: Forward = (layer: Layer, tensor?: Tensor<Size>) => {
   if (!tensor) return undefined;
   try {
