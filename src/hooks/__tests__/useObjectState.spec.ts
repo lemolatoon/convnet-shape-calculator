@@ -1,5 +1,5 @@
 import { useParamState } from "@/hooks/useObjectState";
-import { PrimitiveLayerParams } from "@/type/layer";
+import { Value } from "@/type/layer";
 import { act, renderHook } from "@testing-library/react";
 import { useState } from "react";
 
@@ -11,36 +11,33 @@ describe("useObjectState", () => {
     expect(result.current[0]).toEqual(2);
   });
   test("approriately state changed", () => {
-    const testObject = [
-      { name: "a", val: 1 },
-      { name: "b", val: 2 },
-      { name: "c", val: 3 },
-    ];
-    const normalize = (
-      params: PrimitiveLayerParams<number | "">
-    ): PrimitiveLayerParams<number> =>
-      params.map(({ name, val }) => ({ name, val: val === "" ? 0 : val }));
+    type TestObject = {
+      a: number | "";
+      b: number | "";
+      c: number | "";
+    };
+    const testObject: TestObject = {
+      a: 1,
+      b: 2,
+      c: 3,
+    };
     const updateParams = vitest.fn();
     const { result } = renderHook(() =>
-      useParamState<number | "", number, PrimitiveLayerParams<number>>(
-        testObject,
-        updateParams,
-        normalize
-      )
+      useParamState(testObject, updateParams)
     );
-    expect(result.current.obj).toEqual(testObject);
-    act(() => result.current.dispatch(0, 50));
-    expect(result.current.obj[0].val).toEqual(50);
-    act(() => result.current.dispatch(0, 25));
-    expect(result.current.obj[0].val).toEqual(25);
-    act(() => result.current.dispatch(2, 10));
-    expect(result.current.obj[2].val).toEqual(10);
-    act(() => result.current.dispatch(1, ""));
-    expect(result.current.obj[1].val).toEqual("");
-    expect(updateParams).toBeCalledWith([
-      { name: "a", val: 25 },
-      { name: "b", val: 0 },
-      { name: "c", val: 10 },
-    ]);
+    expect(result.current.params).toEqual(testObject);
+    act(() => result.current.dispatch("a", 50));
+    expect(result.current.params["a"]).toEqual(50);
+    act(() => result.current.dispatch("a", 25));
+    expect(result.current.params["a"]).toEqual(25);
+    act(() => result.current.dispatch("c", 10));
+    expect(result.current.params["c"]).toEqual(10);
+    act(() => result.current.dispatch("b", ""));
+    expect(result.current.params["b"]).toEqual("");
+    expect(updateParams).toBeCalledWith({
+      a: 25,
+      b: "",
+      c: 10,
+    });
   });
 });
