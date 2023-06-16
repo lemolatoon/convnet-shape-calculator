@@ -111,20 +111,11 @@ export const useSequential = <T extends Size>(
 };
 
 type SequentialProps = {
-  initLayers: Layer[];
+  initParams: SequentialLayer;
   inputTensor?: Tensor<Size>;
 };
-export const Sequential = ({ initLayers, inputTensor }: SequentialProps) => {
-  const initSequentialLayer: SequentialLayer = {
-    key: "Sequential",
-    params: {
-      layers: initLayers.map((layer, id) => {
-        return { layer, id };
-      }),
-    },
-  };
-  const [sequentialLayer, setSequentialLayer] =
-    useState<Layer>(initSequentialLayer);
+export const Sequential = ({ initParams, inputTensor }: SequentialProps) => {
+  const [sequentialLayer, setSequentialLayer] = useState<Layer>(initParams);
   const Sequential = renderLayer(sequentialLayer, (layer) =>
     setSequentialLayer(layer)
   );

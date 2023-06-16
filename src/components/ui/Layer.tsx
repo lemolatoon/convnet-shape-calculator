@@ -339,8 +339,14 @@ export const renderLayer: Render = (
         };
       case "Sequential":
         return function Sequential({ tensor }: RenderProps) {
-          const updateParams = (params: SequentialParams) =>
-            updateLayer({ key: "Sequential", params });
+          const updateParams = (params: SequentialParams) => {
+            const layer = {
+              key: "Sequential",
+              params,
+            } as const;
+            console.log(encodeURIComponent(JSON.stringify(layer)));
+            updateLayer(layer);
+          };
           const applyLayer = useSequential(layer.params, updateParams);
           return applyLayer(tensor);
         };

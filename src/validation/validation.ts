@@ -3,13 +3,15 @@ import { JustTensorParams, Layer, SequentialParams } from "@/type/layer";
 import { exhaustiveCheck } from "@/type/util";
 import { Err, Ok, Result } from "neverthrow";
 
-type DeepPartial<T> = T extends object
+export type DeepPartial<T> = T extends object
   ? {
       [P in keyof T]?: DeepPartial<T[P]>;
     }
   : T;
 
-function validateLayer(maybeParam: DeepPartial<Layer>): Result<Layer, string> {
+export function validateLayer(
+  maybeParam: DeepPartial<Layer>
+): Result<Layer, string> {
   if (maybeParam.key == undefined) {
     return new Err("missing key");
   }
@@ -139,7 +141,7 @@ function validateJustTensor(
     name,
   });
 }
-function validateSequential(
+export function validateSequential(
   maybeSequentialParam: DeepPartial<SequentialParams>
 ): Result<SequentialParams, string> {
   const { layers } = maybeSequentialParam;

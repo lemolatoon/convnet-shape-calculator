@@ -1,7 +1,12 @@
 import { Sequential } from "@/components/Sequential";
-import { Layer } from "@/type/layer";
+import { Layer, SequentialLayer, SequentialParams } from "@/type/layer";
 import { Size, Tensor } from "@/type/size";
 import { assetFullUrl, assetUrl } from "@/utils/config";
+import {
+  DeepPartial,
+  validateLayer,
+  validateSequential,
+} from "@/validation/validation";
 import Head from "next/head";
 import { useRouter } from "next/router";
 
@@ -14,6 +19,26 @@ export default function Home() {
   } else if (params != undefined) {
     normalizedParams = params.join(",");
   }
+  let initLayer: SequentialLayer | null = null;
+  if (normalizedParams) {
+    const rawLayer = JSON.parse(normalizedParams) as DeepPartial<Layer>;
+    const validated = validateLayer(rawLayer);
+    validated.match(
+      (layer) => {
+        if (layer.key !== "Sequential") {
+          console.error(
+            `passed query parameter is not Sequential params, but ${layer.key}`
+          );
+          return;
+        }
+        initLayer = layer;
+      },
+      (e) => {
+        console.error(`query params, validation error\n${e}`);
+      }
+    );
+  }
+  console.log(initLayer);
   const input: Tensor<Size> = {
     shape: [32, 1, 28, 28],
   };
@@ -77,6 +102,17 @@ export default function Home() {
       }),
     },
   };
+  const initLayersFallback = [inputLayer, sequentialLayer, outputLayer];
+  const initParamsFallback: SequentialLayer = {
+    key: "Sequential" as const,
+    params: {
+      layers: (initLayer ? [initLayer] : initLayersFallback).map(
+        (layer, id) => {
+          return { layer, id };
+        }
+      ),
+    },
+  };
   return (
     <>
       <Head>
@@ -98,7 +134,8 @@ export default function Home() {
       <main>
         <h1>ConvNet Shape Calculator</h1>
         <Sequential
-          initLayers={[inputLayer, sequentialLayer, outputLayer]}
+          key={normalizedParams}
+          initParams={initLayer ?? initParamsFallback}
           inputTensor={input}
         />
       </main>
