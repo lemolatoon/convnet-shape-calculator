@@ -32,7 +32,8 @@ type Conv2dLayer = LayerFactory<"Conv2d", Conv2dParams>;
 
 type MaxPool2dLayer = LayerFactory<"MaxPool2d", RequiredDeep<MaxPool2dParams>>;
 
-type JustTensorLayer = LayerFactory<"JustTensor", { name: string }>;
+export type JustTensorParams = { name: string };
+type JustTensorLayer = LayerFactory<"JustTensor", JustTensorParams>;
 
 export type Layer =
   | SequentialLayer

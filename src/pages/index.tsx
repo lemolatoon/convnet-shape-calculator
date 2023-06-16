@@ -3,8 +3,17 @@ import { Layer } from "@/type/layer";
 import { Size, Tensor } from "@/type/size";
 import { assetFullUrl, assetUrl } from "@/utils/config";
 import Head from "next/head";
+import { useRouter } from "next/router";
 
 export default function Home() {
+  const router = useRouter();
+  const params = router.query["params"];
+  let normalizedParams: string | null = null;
+  if (typeof params === "string") {
+    normalizedParams = params;
+  } else if (params != undefined) {
+    normalizedParams = params.join(",");
+  }
   const input: Tensor<Size> = {
     shape: [32, 1, 28, 28],
   };

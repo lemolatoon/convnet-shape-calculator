@@ -12,7 +12,7 @@ import {
   SequentialParams,
 } from "@/type/layer";
 import { displaySize, Size } from "@/type/size";
-import { exhaustiveChack, RequiredDeep } from "@/type/util";
+import { exhaustiveCheck, RequiredDeep } from "@/type/util";
 import { useState } from "react";
 import styled from "styled-components";
 import { BiDuplicate } from "react-icons/bi";
@@ -356,7 +356,7 @@ export const renderLayer: Render = (
           return applyLayer(tensor);
         };
       default:
-        exhaustiveChack(layer);
+        exhaustiveCheck(layer);
         throw new Error("unreacheable");
     }
   })();
