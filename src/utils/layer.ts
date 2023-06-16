@@ -1,7 +1,7 @@
 import { conv2d, maxpool2d } from "@/components/layers/sizeFuncs";
 import { Clone, Forward, Layer, LayerKey } from "@/type/layer";
 import { Size, Tensor } from "@/type/size";
-import { exhaustiveChack } from "@/type/util";
+import { exhaustiveCheck } from "@/type/util";
 
 export const forward: Forward = (layer: Layer, tensor?: Tensor<Size>) => {
   if (!tensor) return undefined;
@@ -23,7 +23,7 @@ export const forward: Forward = (layer: Layer, tensor?: Tensor<Size>) => {
           shape: maxpool2d(layer.params)(tensor.shape),
         };
       default:
-        exhaustiveChack(layer);
+        exhaustiveCheck(layer);
         throw new Error("unreacheable");
     }
   } catch {
@@ -70,7 +70,7 @@ export const defaultLayer = <K extends LayerKey>(key: K): Layer => {
         },
       };
     default:
-      exhaustiveChack(key);
+      exhaustiveCheck(key);
       throw new Error("unreacheable");
   }
 };
