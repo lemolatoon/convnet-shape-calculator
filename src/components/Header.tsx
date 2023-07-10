@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Modal } from 'react-overlays';
 import styled from 'styled-components';
 import { CenteredModal } from './ui/Modal';
+import { SaveLoadParam } from './SaveLoadParam';
 
 const HeaderContainer = styled.div`
   display: grid;
@@ -37,7 +37,9 @@ export const Header: React.FC = () => {
     <HeaderContainer>
       <Title>Headerのタイトル</Title>
       <Button onClick={handleButtonClick}>ボタン</Button>
-      <CenteredModal show={isModalOpen} close={closeModal}><div>モーダルのコンテンツ</div></CenteredModal>
+      <CenteredModal show={isModalOpen} close={closeModal}>
+        <SaveLoadParam param={"abc"} loadParams={(a) => alert(a)} />
+      </CenteredModal>
     </HeaderContainer>
   );
 };
