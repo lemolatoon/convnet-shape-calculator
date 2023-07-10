@@ -1,3 +1,4 @@
+import { Header } from "@/components/Header";
 import { Sequential } from "@/components/Sequential";
 import { Layer, SequentialLayer, SequentialParams } from "@/type/layer";
 import { Size, Tensor } from "@/type/size";
@@ -5,7 +6,6 @@ import { assetFullUrl, assetUrl } from "@/utils/config";
 import {
   DeepPartial,
   validateLayer,
-  validateSequential,
 } from "@/validation/validation";
 import Head from "next/head";
 import { useRouter } from "next/router";
@@ -132,7 +132,7 @@ export default function Home() {
         <meta property="twitter:image" content={assetFullUrl("/conv.png")} />
       </Head>
       <main>
-        <h1>ConvNet Shape Calculator</h1>
+        <Header />
         <Sequential
           key={normalizedParams}
           initParams={initLayer ?? initParamsFallback}
